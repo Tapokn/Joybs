@@ -1,0 +1,37 @@
+__pycache__/
+*.pyc
+.env
+.venv
+*.db
+*.sqlite
+*.log
+.DS_Store
+
+
+# Виртуальное окружение
+venv/
+.venv/
+env/
+
+# Кэш Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Секретные переменные
+.env
+
+# Данные и логи (если не хотите их выкладывать)
+data/
+*.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Файлы чекпоинтов
+checkpoint.json
+
+#кеш-токен
+.token_cache.json

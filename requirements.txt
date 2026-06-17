@@ -1,0 +1,3 @@
+fastapi[standart]
+uvicorn[standard]
+aiosqlite

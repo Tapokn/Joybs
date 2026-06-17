@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Вакансии - Аналитика</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    
+    <style>
+        /* Общие стили, светлая тема, пастельные цвета */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9f7f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        /* Хэдер */
+        header {
+            background: #fff;
+            border-bottom: 1px solid #e0dcd8;
+            padding: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #4a6fa5;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-tab {
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #5a5a5a;
+            transition: 0.2s;
+        }
+        .nav-tab:hover {
+            background: #e8e3de;
+        }
+        .nav-tab.active {
+            background: #d4cfca;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        /* Основной макет: левая панель (контекст), правая (якоря), центр */
+        .page {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+            min-height: 70vh;
+        }
+        .left-panel {
+            width: 200px;
+            flex-shrink: 0;
+        }
+        .right-panel {
+            width: 200px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        /* Блок контекста слева */
+        .context-selector {
+            background: #f1ede9;
+            border-radius: 12px;
+            padding: 18px 14px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .context-selector label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #4a4a4a;
+        }
+        .context-selector select, 
+        .context-selector input {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            border: 1px solid #d0cbc6;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 0.9rem;
+        }
+        .context-selector .apply-btn {
+            background: #b8b0a8;
+            color: #fff;
+            border: none;
+            padding: 8px 0;
+            width: 100%;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .context-selector .apply-btn:hover {
+            background: #a69c92;
+        }
+        /* Правая навигация (якоря) */
+        .anchor-nav {
+            background: #f1ede9;
+            border-radius: 12px;
+            padding: 16px 12px;
+        }
+        .anchor-nav a {
+            display: block;
+            padding: 6px 0;
+            color: #4a4a4a;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #e3ddd7;
+        }
+        .anchor-nav a:last-child { border-bottom: none; }
+        .anchor-nav a:hover { color: #2c3e50; font-weight: 500; }
+        /* Секции */
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #ede9e4;
+        }
+        .card h3 {
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #3a4a5a;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .flex-row .card {
+            flex: 1;
+            min-width: 280px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .chart-container-sm {
+            height: 250px;
+        }
+        /* Агрегатор */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 20px;
+            margin-bottom: 24px;
+        }
+        .filters input, .filters select {
+            padding: 8px 12px;
+            border: 1px solid #d0cbc6;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 0.9rem;
+        }
+        .filters button {
+            background: #b8b0a8;
+            color: #fff;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .vacancy-card {
+            border-bottom: 1px solid #ede9e4;
+            padding: 16px 0;
+        }
+        .vacancy-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: #1a2a3a;
+        }
+        .vacancy-card .meta {
+            font-size: 0.9rem;
+            color: #6a6a6a;
+            margin-bottom: 6px;
+        }
+        .vacancy-card .desc {
+            font-size: 0.95rem;
+            color: #3a3a3a;
+            max-height: 80px;
+            overflow: hidden;
+        }
+        .vacancy-card .desc p { margin: 0; }
+        .load-more {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .load-more button {
+            background: #d4cfca;
+            border: none;
+            padding: 10px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .load-more button:hover {
+            background: #c2bbb4;
+        }
+        /* Граф профессий D3 */
+        #profession-graph {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ede9e4;
+            border-radius: 12px;
+            background: #fcfaf8;
+        }
+        /* Граф навыков vis */
+        #skills-graph-container {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ede9e4;
+            border-radius: 12px;
+            background: #fcfaf8;
+        }
+        /* Адаптив */
+        @media (max-width: 1024px) {
+            .page { flex-wrap: wrap; }
+            .left-panel, .right-panel { width: 100%; position: static; }
+            .right-panel { display: flex; flex-wrap: wrap; gap: 10px; }
+            .anchor-nav { display: flex; flex-wrap: wrap; gap: 10px; }
+            .anchor-nav a { border-bottom: none; padding: 4px 12px; background: #e8e3de; border-radius: 20px; }
+        }
+        @media (max-width: 600px) {
+            .header-inner { flex-wrap: wrap; gap: 10px; }
+            .nav-tabs { flex-wrap: wrap; }
+            .container { padding: 0 15px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <div class="logo">IT Vacancy Analytics</div>
+            <div class="nav-tabs" id="mainTabs">
+                <button class="nav-tab active" data-tab="about">О проекте</button>
+                <button class="nav-tab" data-tab="analytics">Аналитика</button>
+                <button class="nav-tab" data-tab="aggregator">Агрегатор</button>
+            </div>
+        </div>
+    </header>
+    <div class="container page">
+        <!-- Левая панель: выбор контекста (отображается только на вкладке Аналитика) -->
+        <div class="left-panel" id="leftPanel">
+            <div class="context-selector">
+                <label>Контекст</label>
+                <select id="contextType">
+                    <option value="all">Весь рынок</option>
+                    <option value="group">Группа</option>
+                    <option value="profession">Профессия</option>
+                </select>
+                <input type="text" id="contextValue" placeholder="Название группы или профессии">
+                <button class="apply-btn" id="applyContext">Применить</button>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="main-content">
+            <!-- ===== СЕКЦИЯ О ПРОЕКТЕ ===== -->
+            <div class="section active" id="section-about">
+                <h2 class="section-title">О проекте</h2>
+                <div class="card">
+                    <p>Веб-приложение для анализа рынка IT-вакансий на основе данных с hh.ru. Данные содержат ~10 000 вакансий.</p>
+                    <p><strong>Стек:</strong> Python FastAPI, SQLite, Chart.js, D3.js, vis-network.</p>
+                    <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам профессий, востребованные навыки, влияние навыков на зарплату.</p>
+                    <p><strong>Граф профессий</strong> построен на основе коэффициента Жаккара по навыкам.</p>
+                </div>
+                <div class="card">
+                    <h3>Граф сходства профессий</h3>
+                    <div id="profession-graph"></div>
+                    <div style="margin-top:12px; display:flex; gap:12px; flex-wrap:wrap;">
+                        <label>Порог Жаккара: <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1"></label>
+                        <label>Мин. вакансий: <input type="number" id="minVacancies" value="5" min="1" style="width:60px;"></label>
+                        <label>Группа: 
+                            <select id="graphGroupFilter"><option value="">Все</option></select>
+                        </label>
+                        <button id="updateGraphBtn">Обновить граф</button>
+                    </div>
+                    <div id="graph-tooltip" style="margin-top:12px; background:#f1ede9; padding:10px; border-radius:8px; min-height:30px;"></div>
+                </div>
+            </div>
+
+            <!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
+            <div class="section" id="section-analytics">
+                <h2 class="section-title">Аналитика и навыки</h2>
+                <!-- Блок "Аналитика в цифрах" -->
+                <div class="card" id="overview-stats">
+                    <h3>Общая статистика</h3>
+                    <div id="statsPlaceholder">Загрузка...</div>
+                </div>
+                <div class="flex-row">
+                    <div class="card">
+                        <h3>Распределение вакансий</h3>
+                        <div class="chart-container"><canvas id="pieChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3>Медианная зарплата по группам</h3>
+                        <div class="chart-container"><canvas id="medianBarChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Гистограмма зарплат</h3>
+                    <div class="chart-container"><canvas id="histogramChart"></canvas></div>
+                </div>
+                <div class="flex-row">
+                    <div class="card">
+                        <h3>Распределение по формату работы</h3>
+                        <div class="chart-container-sm"><canvas id="workFormatChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <h3>Распределение по опыту</h3>
+                        <div class="chart-container-sm"><canvas id="experienceChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Топ-10 навыков</h3>
+                    <div class="chart-container"><canvas id="topSkillsChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3>Влияние навыков на зарплату</h3>
+                    <div class="chart-container"><canvas id="salaryImpactChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3>Матрица совместной встречаемости навыков</h3>
+                    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:12px;">
+                        <label>Топ навыков:
+                            <select id="matrixTopN">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                            </select>
+                        </label>
+                        <label>Мин. встречаемость:
+                            <input type="number" id="matrixMinCooc" value="5" min="1" style="width:70px;">
+                        </label>
+                        <button id="updateMatrixBtn">Обновить матрицу</button>
+                    </div>
+                    <div id="skills-matrix-container" style="width:100%; height:500px; overflow:auto; border:1px solid #ede9e4; border-radius:12px; background:#fcfaf8;"></div>
+</div>
+                </div>
+            </div>
+
+            <!-- ===== СЕКЦИЯ АГРЕГАТОР ===== -->
+            <div class="section" id="section-aggregator">
+                <h2 class="section-title">Агрегатор вакансий</h2>
+                <div class="card">
+                    <div class="filters">
+                        <input type="text" id="filterCity" placeholder="Город">
+                        <input type="text" id="filterSkills" placeholder="Навыки">
+                        <select id="filterExperience"><option value="">Опыт</option></select>
+                        <input type="number" id="filterSalaryFrom" placeholder="Зарплата от">
+                        <input type="number" id="filterSalaryTo" placeholder="Зарплата до">
+                        <label><input type="checkbox" id="filterHasSalary"> Только с зарплатой</label>
+                        <input type="text" id="filterCompany" placeholder="Компания">
+                        <button id="applyFilters">Применить фильтры</button>
+                    </div>
+                    <div id="vacancyList"></div>
+                    <div class="load-more"><button id="loadMoreBtn">Загрузить ещё</button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая панель: якоря (только для аналитики) -->
+        <div class="right-panel" id="rightPanel">
+            <div class="anchor-nav">
+                <a href="#section-analytics">Обзор</a>
+                <a href="#section-analytics" data-scroll="pie">Распределение</a>
+                <a href="#section-analytics" data-scroll="median">Зарплата по группам</a>
+                <a href="#section-analytics" data-scroll="hist">Гистограмма</a>
+                <a href="#section-analytics" data-scroll="dist">Распределения</a>
+                <a href="#section-analytics" data-scroll="topskills">Топ-навыки</a>
+                <a href="#section-analytics" data-scroll="impact">Влияние навыков</a>
+                <a href="#section-analytics" data-scroll="skillgraph">Граф навыков</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- Глобальные переменные ----------
+        let currentTab = 'about';
+        let contextType = 'all';
+        let contextValue = '';
+        let currentOffset = 0;
+        const LIMIT = 20;
+        let totalVacancies = 0;
+
+        // Chart.js инстансы
+        let pieChart, medianBarChart, histogramChart, workFormatChart, experienceChart, topSkillsChart, salaryImpactChart;
+
+        // ---------- Переключение вкладок ----------
+        document.querySelectorAll('#mainTabs .nav-tab').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#mainTabs .nav-tab').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                currentTab = tab;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('section-' + tab).classList.add('active');
+                // Показываем/скрываем боковые панели
+                if (tab === 'analytics') {
+                    document.getElementById('leftPanel').style.display = 'block';
+                    document.getElementById('rightPanel').style.display = 'block';
+                } else {
+                    document.getElementById('leftPanel').style.display = 'none';
+                    document.getElementById('rightPanel').style.display = 'none';
+                }
+                if (tab === 'about') {
+                    loadProfessionGraph();
+                } else if (tab === 'analytics') {
+                    loadAnalytics();
+                } else if (tab === 'aggregator') {
+                    loadVacancies();
+                }
+            });
+        });
+
+        // Показываем левую панель по умолчанию для аналитики, но скрываем для других
+        document.getElementById('leftPanel').style.display = 'none';
+        document.getElementById('rightPanel').style.display = 'none';
+
+        // ---------- Контекст ----------
+        document.getElementById('applyContext').addEventListener('click', function() {
+            contextType = document.getElementById('contextType').value;
+            contextValue = document.getElementById('contextValue').value.trim();
+            if (currentTab === 'analytics') loadAnalytics();
+            if (currentTab === 'about') loadProfessionGraph();
+        });
+
+        // ---------- Загрузка аналитики ----------
+        async function loadAnalytics() {
+            const url = `/api/analytics/overview?context_type=${contextType}&context_value=${encodeURIComponent(contextValue)}`;
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                renderOverview(data);
+                renderCharts(data);
+            } catch(e) {
+                console.error('Ошибка загрузки аналитики:', e);
+            }
+            // Загружаем навыки
+            loadTopSkills();
+            loadSalaryImpact();
+            loadSkillsMatrix(); }
+
+        function renderOverview(data) {
+            const stats = data.stats;
+            document.getElementById('statsPlaceholder').innerHTML = `
+                <p><strong>Всего вакансий:</strong> ${stats.total_vacancies} &nbsp;|&nbsp;
+                <strong>Групп профессий:</strong> ${stats.total_groups} &nbsp;|&nbsp;
+                <strong>Общая медиана зарплаты:</strong> ${data.overall_median ? Math.round(data.overall_median).toLocaleString() + ' ₽' : 'Нет данных'}
+                </p>
+            `;
+        }
+
+        function renderCharts(data) {
+            // Pie chart
+            const pieData = data.pie_data;
+            if (pieChart) pieChart.destroy();
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
+            pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: pieData.map(d => d.label),
+                    datasets: [{
+                        data: pieData.map(d => d.count),
+                        backgroundColor: ['#4682B4', '#5A9BD5', '#6CA6D9', '#7FB3E0', '#92C0E6', '#A5CDEC', '#B8DAF2', '#CBE7F8', '#DEEFFB', '#EEF7FC', '#B0B0B0']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' },
+                        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + ' (' + (ctx.parsed / data.pie_data.reduce((a,b) => a + b.count, 0) * 100).toFixed(1) + '%)' } }
+                    }
+                }
+            });
+
+            // Median bar chart
+            const medData = data.median_by_groups;
+            if (medianBarChart) medianBarChart.destroy();
+            const ctxMed = document.getElementById('medianBarChart').getContext('2d');
+            medianBarChart = new Chart(ctxMed, {
+                type: 'bar',
+                data: {
+                    labels: medData.map(d => d.label),
+                    datasets: [{
+                        label: 'Медианная зарплата, ₽',
+                        data: medData.map(d => d.median_salary),
+                        backgroundColor: '#4682B4'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Histogram
+            const histData = data.histogram;
+            if (histogramChart) histogramChart.destroy();
+            const ctxHist = document.getElementById('histogramChart').getContext('2d');
+            histogramChart = new Chart(ctxHist, {
+                type: 'bar',
+                data: {
+                    labels: histData.map(d => (d.bin_start/1000).toFixed(0) + 'k'),
+                    datasets: [{
+                        label: 'Количество вакансий',
+                        data: histData.map(d => d.count),
+                        backgroundColor: '#4682B4'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            // Distributions
+            const dist = data.distributions;
+            renderDistribution('workFormatChart', dist.work_format, 'Формат работы');
+            renderDistribution('experienceChart', dist.experience, 'Опыт');
+        }
+
+        function renderDistribution(canvasId, data, label) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            let chart = window[canvasId + 'Chart']; // сохраним в глобальном объекте
+            if (chart) chart.destroy();
+            const labels = data.map(d => d.value);
+            const counts = data.map(d => d.count);
+            const newChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: counts,
+                        backgroundColor: '#6CA6D9'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            window[canvasId + 'Chart'] = newChart;
+        }
+
+        // ---------- Топ-навыки ----------
+        async function loadTopSkills() {
+            const url = `/api/skills/top?context_type=${contextType}&context_value=${encodeURIComponent(contextValue)}&limit=10`;
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (topSkillsChart) topSkillsChart.destroy();
+                const ctx = document.getElementById('topSkillsChart').getContext('2d');
+                topSkillsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.skill),
+                        datasets: [{
+                            label: 'Частота',
+                            data: data.map(d => d.count),
+                            backgroundColor: '#4682B4'
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { beginAtZero: true } }
+                    }
+                });
+            } catch(e) { console.error('Top skills error', e); }
+        }
+
+        // ---------- Влияние навыков ----------
+        async function loadSalaryImpact() {
+            const url = `/api/skills/salary-impact?context_type=${contextType}&context_value=${encodeURIComponent(contextValue)}&top_n=20`;
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (salaryImpactChart) salaryImpactChart.destroy();
+                const ctx = document.getElementById('salaryImpactChart').getContext('2d');
+                const labels = data.map(d => d.skill);
+                const diffs = data.map(d => d.diff);
+                const colors = diffs.map(d => d >= 0 ? '#2ca02c' : '#d62728');
+                salaryImpactChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Разница медиан (с навыком - без)',
+                            data: diffs,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { beginAtZero: true } }
+                    }
+                });
+            } catch(e) { console.error('Salary impact error', e); }
+        }
+
+     // ---------- Матрица совместной встречаемости (D3 heatmap) ----------
+async function loadSkillsMatrix() {
+    const topN = parseInt(document.getElementById('matrixTopN').value);
+    const minCooc = parseInt(document.getElementById('matrixMinCooc').value) || 5;
+    const url = `/api/skills/graph?context_type=${contextType}&context_value=${encodeURIComponent(contextValue)}&min_cooccurrence=${minCooc}`;
+    try {
+        const resp = await fetch(url);
+        const data = await resp.json();
+        renderMatrix(data, topN);
+    } catch(e) {
+        console.error('Ошибка загрузки матрицы навыков:', e);
+    }
+}
+
+    function renderMatrix(data, topN) {
+        const container = document.getElementById('skills-matrix-container');
+        container.innerHTML = '';
+
+        // Строим словарь весов рёбер
+        const edgeMap = {};
+        data.edges.forEach(e => {
+            const key = [e.source, e.target].sort().join('|');
+            edgeMap[key] = e.weight;
+        });
+
+        // Частота навыков
+        const skillCount = {};
+        data.nodes.forEach(n => skillCount[n.id] = n.count);
+
+        // Сортируем навыки по частоте и берём топN
+        const sortedSkills = Object.keys(skillCount).sort((a,b) => skillCount[b] - skillCount[a]);
+        const topSkills = sortedSkills.slice(0, topN);
+
+        if (topSkills.length === 0) {
+            container.innerHTML = '<p style="padding:20px;">Нет данных для отображения</p>';
+            return;
+        }
+
+        // Строим матрицу (N x N)
+        const N = topSkills.length;
+        const matrix = [];
+        for (let i = 0; i < N; i++) {
+            matrix[i] = [];
+            for (let j = 0; j < N; j++) {
+                if (i === j) {
+                    matrix[i][j] = 0;
+                } else {
+                    const key = [topSkills[i], topSkills[j]].sort().join('|');
+                    matrix[i][j] = edgeMap[key] || 0;
+                }
+            }
+        }
+
+        // Находим максимальный вес для цветовой шкалы
+        let maxWeight = 0;
+        for (let i = 0; i < N; i++) {
+            for (let j = 0; j < N; j++) {
+                if (matrix[i][j] > maxWeight) maxWeight = matrix[i][j];
+            }
+        }
+        if (maxWeight === 0) maxWeight = 1;
+
+        // --- D3 Heatmap ---
+        const width = container.clientWidth || 600;
+        const height = container.clientHeight || 500;
+        const margin = { top: 80, right: 80, bottom: 80, left: 80 };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        const cellSize = Math.min(innerWidth / N, innerHeight / N);
+
+        const svg = d3.select(container)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        // Цветовая шкала (от белого к синему)
+        const colorScale = d3.scaleSequential(d3.interpolateBlues)
+            .domain([0, maxWeight]);
+
+        // Создаём ячейки
+        const cells = svg.selectAll('rect')
+            .data(d3.cross(d3.range(N), d3.range(N)))
+            .enter()
+            .append('rect')
+            .attr('x', d => d[1] * cellSize)
+            .attr('y', d => d[0] * cellSize)
+            .attr('width', cellSize - 1)
+            .attr('height', cellSize - 1)
+            .style('fill', d => {
+                const val = matrix[d[0]][d[1]];
+                return val ? colorScale(val) : '#f5f5f5';
+            })
+            .style('stroke', '#ddd')
+            .style('stroke-width', 0.5);
+
+        // Добавляем подсказки
+        cells.append('title')
+            .text(d => {
+                const i = d[0], j = d[1];
+                if (i === j) return topSkills[i];
+                return `${topSkills[i]} ↔ ${topSkills[j]}: ${matrix[i][j]}`;
+            });
+
+        // Подписи осей X (навыки)
+        svg.append('g')
+            .selectAll('text')
+            .data(topSkills)
+            .enter()
+            .append('text')
+            .attr('x', (d, i) => i * cellSize + cellSize/2)
+            .attr('y', -10)
+            .style('text-anchor', 'end')
+            .style('font-size', '10px')
+            .style('transform', 'rotate(-45deg)')
+            .style('transform-origin', (d, i) => `${i * cellSize + cellSize/2}px 0px`)
+            .text(d => d);
+
+        // Подписи оси Y (навыки)
+        svg.append('g')
+            .selectAll('text')
+            .data(topSkills)
+            .enter()
+            .append('text')
+            .attr('y', (d, i) => i * cellSize + cellSize/2)
+            .attr('x', -10)
+            .style('text-anchor', 'end')
+            .style('font-size', '10px')
+            .text(d => d);
+
+        // Легенда (цветовая шкала)
+        const legendWidth = 200;
+        const legendHeight = 20;
+        const legendX = (innerWidth - legendWidth) / 2;
+        const legendY = innerHeight + 30;
+
+        const defs = svg.append('defs');
+        const linearGradient = defs.append('linearGradient')
+            .attr('id', 'legendGradient')
+            .attr('x1', '0%').attr('y1', '0%')
+            .attr('x2', '100%').attr('y2', '0%');
+        linearGradient.append('stop').attr('offset', '0%').attr('stop-color', '#f5f5f5');
+        linearGradient.append('stop').attr('offset', '100%').attr('stop-color', '#4682B4');
+
+        svg.append('rect')
+            .attr('x', legendX)
+            .attr('y', legendY)
+            .attr('width', legendWidth)
+            .attr('height', legendHeight)
+            .style('fill', 'url(#legendGradient)')
+            .style('stroke', '#ccc');
+
+        svg.append('text')
+            .attr('x', legendX)
+            .attr('y', legendY + legendHeight + 18)
+            .style('font-size', '10px')
+            .text('0');
+
+        svg.append('text')
+            .attr('x', legendX + legendWidth)
+            .attr('y', legendY + legendHeight + 18)
+            .style('font-size', '10px')
+            .style('text-anchor', 'end')
+            .text(maxWeight);
+    }
+
+    // Обработчик кнопки обновления матрицы
+    document.getElementById('updateMatrixBtn').addEventListener('click', loadSkillsMatrix);
+
+    // При загрузке вкладки аналитики вызываем матрицу
+    // В loadAnalytics() вместо loadSkillsGraph() вызываем loadSkillsMatrix()   
+    
+
+
+        // ---------- Граф профессий (D3) ----------
+        async function loadProfessionGraph() {
+            const threshold = document.getElementById('jaccardThreshold').value || 0.1;
+            const minVac = document.getElementById('minVacancies').value || 5;
+            const group = document.getElementById('graphGroupFilter').value || '';
+            const url = `/api/graph/professions?threshold=${threshold}&min_vacancies=${minVac}&group=${encodeURIComponent(group)}`;
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                renderD3Graph(data);
+            } catch(e) { console.error('Profession graph error', e); }
+        }
+
+        function renderD3Graph(data) {
+            const container = document.getElementById('profession-graph');
+            container.innerHTML = '';
+            const width = container.clientWidth || 800;
+            const height = container.clientHeight || 600;
+
+            // Удаляем старый svg, если есть
+            d3.select(container).selectAll('*').remove();
+
+            const svg = d3.select(container)
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            const nodes = data.nodes.map(n => ({ id: n.id, label: n.label, group: n.group, count: n.vacancy_count }));
+            const edges = data.edges.map(e => ({ source: e.source, target: e.target, weight: e.weight, common: e.common_skills }));
+
+            const simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(edges).id(d => d.id).distance(120))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width/2, height/2));
+
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(edges)
+                .enter().append('line')
+                .attr('stroke', '#999')
+                .attr('stroke-opacity', 0.6)
+                .attr('stroke-width', d => Math.sqrt(d.weight) * 3);
+
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .enter().append('circle')
+                .attr('r', d => 5 + Math.sqrt(d.count) * 2)
+                .attr('fill', d => {
+                    // Цвета по группам (палитра)
+                    const colors = ['#4682B4','#5A9BD5','#6CA6D9','#7FB3E0','#92C0E6','#A5CDEC','#B8DAF2','#CBE7F8','#DEEFFB','#EEF7FC','#B0B0B0'];
+                    let hash = 0;
+                    for (let i = 0; i < d.group.length; i++) hash = d.group.charCodeAt(i) + ((hash << 5) - hash);
+                    return colors[Math.abs(hash) % colors.length];
+                })
+                .attr('stroke', '#2c3e50')
+                .attr('stroke-width', 1)
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+
+            const label = svg.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .enter().append('text')
+                .text(d => d.label)
+                .attr('font-size', '10px')
+                .attr('dx', 12)
+                .attr('dy', 4);
+
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+                label
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+
+            // Обработчик клика по узлу – показываем навыки
+            node.on('click', function(event, d) {
+                fetch(`/api/graph/profession/${encodeURIComponent(d.label)}/skills?limit=10`)
+                    .then(resp => resp.json())
+                    .then(data => {
+                        const tooltip = document.getElementById('graph-tooltip');
+                        tooltip.innerHTML = `<strong>${d.label}</strong> (${d.count} вакансий)<br>Топ навыки: ${data.map(s => s.skill + ' (' + s.count + ')').join(', ')}`;
+                    });
+            });
+
+            // Обработчик клика по ребру – общие навыки
+            link.on('click', function(event, d) {
+                const source = d.source.label || d.source.id;
+                const target = d.target.label || d.target.id;
+                fetch(`/api/graph/edge/skills?prof_a=${encodeURIComponent(source)}&prof_b=${encodeURIComponent(target)}`)
+                    .then(resp => resp.json())
+                    .then(data => {
+                        const tooltip = document.getElementById('graph-tooltip');
+                        tooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${data.common_skills.join(', ') || 'нет'}`;
+                    });
+            });
+        }
+
+        document.getElementById('updateGraphBtn').addEventListener('click', loadProfessionGraph);
+
+        // Загружаем список групп для фильтра графа
+        async function loadGraphGroups() {
+            try {
+                const resp = await fetch('/api/analytics/overview?context_type=all');
+                const data = await resp.json();
+                const groups = data.median_by_groups.map(d => d.label);
+                const sel = document.getElementById('graphGroupFilter');
+                sel.innerHTML = '<option value="">Все</option>';
+                groups.forEach(g => {
+                    const opt = document.createElement('option');
+                    opt.value = g;
+                    opt.textContent = g;
+                    sel.appendChild(opt);
+                });
+            } catch(e) {}
+        }
+        loadGraphGroups();
+
+        // ---------- Агрегатор вакансий ----------
+        async function loadVacancies(resetOffset = true) {
+            if (resetOffset) currentOffset = 0;
+            const params = new URLSearchParams();
+            params.set('offset', currentOffset);
+            params.set('limit', LIMIT);
+            const city = document.getElementById('filterCity').value.trim();
+            if (city) params.set('city', city);
+            const skills = document.getElementById('filterSkills').value.trim();
+            if (skills) params.set('skills', skills);
+            const exp = document.getElementById('filterExperience').value;
+            if (exp) params.set('experience', exp);
+            const from = document.getElementById('filterSalaryFrom').value;
+            if (from) params.set('salary_from', from);
+            const to = document.getElementById('filterSalaryTo').value;
+            if (to) params.set('salary_to', to);
+            if (document.getElementById('filterHasSalary').checked) params.set('has_salary', 'true');
+            const company = document.getElementById('filterCompany').value.trim();
+            if (company) params.set('company', company);
+            const url = '/api/vacancies?' + params.toString();
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                totalVacancies = data.total;
+                const list = document.getElementById('vacancyList');
+                if (resetOffset) list.innerHTML = '';
+                data.items.forEach(v => {
+                    const card = document.createElement('div');
+                    card.className = 'vacancy-card';
+                    const salary = v.salary_from || v.salary_to ? (v.salary_from || '') + ' - ' + (v.salary_to || '') + ' ' + v.salary_currency : 'з/п не указана';
+                    card.innerHTML = `
+                        <h4>${v.title || 'Без названия'}</h4>
+                        <div class="meta">${v.company || ''} • ${v.city || ''} • ${v.experience || ''}</div>
+                        <div class="meta">Зарплата: ${salary}</div>
+                        <div class="desc">${v.description ? v.description.substring(0, 300) + '...' : ''}</div>
+                    `;
+                    list.appendChild(card);
+                });
+                currentOffset += data.items.length;
+                document.getElementById('loadMoreBtn').style.display = data.items.length < LIMIT ? 'none' : 'inline-block';
+            } catch(e) { console.error('Vacancies error', e); }
+        }
+
+        document.getElementById('applyFilters').addEventListener('click', () => loadVacancies(true));
+        document.getElementById('loadMoreBtn').addEventListener('click', () => loadVacancies(false));
+
+        // Загружаем список опыта для фильтра
+        async function loadExperienceOptions() {
+            try {
+                const resp = await fetch('/api/analytics/overview?context_type=all');
+                const data = await resp.json();
+                const exp = data.distributions.experience || [];
+                const sel = document.getElementById('filterExperience');
+                sel.innerHTML = '<option value="">Опыт</option>';
+                exp.forEach(e => {
+                    const opt = document.createElement('option');
+                    opt.value = e.value;
+                    opt.textContent = e.value;
+                    sel.appendChild(opt);
+                });
+            } catch(e) {}
+        }
+        loadExperienceOptions();
+
+        // Инициализация: показываем "О проекте" и загружаем граф
+        document.querySelector('[data-tab="about"]').click();
+    </script>
+</body>
+</html>
