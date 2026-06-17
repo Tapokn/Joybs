@@ -1,0 +1,505 @@
+/* ===== АГРЕГАТОР – ТОЛЬКО ФИЛЬТРЫ ===== */
+/* ===== КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК ДЛЯ КОМПАНИЙ ===== */
+.company-wrapper {
+    position: relative;
+    height: 2.6rem;
+    flex: 0 1 220px;
+    max-width: 220px;
+    min-width: 120px;
+}
+.company-wrapper input {
+    width: 100%;
+    height: 100%;
+    padding: 0 0.8rem;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    background: #FFFFFF;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #2C3E50;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.company-wrapper input:focus {
+    border-color: #4682B4;
+    box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.15);
+}
+
+/* Кастомный выпадающий список компаний */
+.company-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.company-dropdown.active {
+    display: block;
+}
+.company-dropdown .company-item {
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.1s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.company-dropdown .company-item:hover {
+    background: #F2EDE8;
+}
+.company-dropdown .company-item:not(:last-child) {
+    border-bottom: 1px solid #F2EDE8;
+}
+/*------------------------------------------------------*/
+/* Блок агрегатора: центрируем карточку и убираем заголовок */
+.section#section-aggregator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.section#section-aggregator .section__title {
+    display: none; /* скрываем заголовок "Агрегатор вакансий" */
+}
+.section#section-aggregator .card {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Общие стили для фильтров – единая высота, шрифт, скругления */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 0.8rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+/* Все поля, select, обёртка навыков, кнопки – одинаковые */
+.filters input,
+.filters select,
+.filters .skills-wrapper input,
+.filters button {
+    height: 2.6rem;
+    padding: 0 0.8rem;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    background: #FFFFFF;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #2C3E50;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Ограничиваем ширину выпадающих списков и поля навыков – не больше 220px */
+.filters select,
+.filters .skills-wrapper {
+    flex: 0 0 auto;        /* не растягиваются */
+    width: auto;
+    max-width: 220px;      /* максимальная ширина */
+    min-width: 120px;      /* минимальная ширина */
+}
+
+/* Поля ввода текста (поиск, город) – могут растягиваться, но не слишком */
+.filters input:not([type="checkbox"]):not([type="number"]) {
+    flex: 1 1 160px;
+    max-width: 280px;
+    min-width: 120px;
+}
+
+
+/* Поля зарплаты (числовые) */
+.filters input[type="number"] {
+    flex: 0 1 100px;
+    min-width: 80px;
+    max-width: 120px;
+}
+
+/* Убираем растяжение для обёртки навыков (уже есть, но дополним) */
+.filters .skills-wrapper {
+    position: relative;
+    height: 2.6rem;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 220px;
+    min-width: 120px;
+}
+.filters .skills-wrapper input {
+    width: 100%;
+    height: 100%;
+    padding-right: 2rem;
+}
+
+/* Стили для выпадающих списков (select) – закруглённые, с кастомной стрелкой */
+/* Стили для выпадающих списков (select) и их опций */
+.filters select {
+    appearance: none;                /* отключаем стандартный вид */
+    padding-right: 1.8rem;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237F8C8D' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    width: 100%;
+    max-width: 220px;                /* ограничиваем ширину самого select */
+    min-width: 120px;
+    box-sizing: border-box;
+    /* наследуем общие стили */
+    height: 2.6rem;
+    padding: 0 0.8rem;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #2C3E50;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.filters select option {
+    max-width: 220px;                /* ограничиваем ширину опций */
+    overflow: hidden;
+    text-overflow: ellipsis;         /* обрезаем длинный текст с многоточием */
+    white-space: nowrap;             /* запрещаем перенос */
+    padding: 0.4rem 0.8rem;
+    font-size: 0.95rem;
+    background: #FFFFFF;
+    color: #2C3E50;
+    box-sizing: border-box;
+}
+.filters select:focus {
+    border-color: #4682B4;
+    box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.15);
+}
+
+/* Кастомный выпадающий список навыков – закруглённый, как у select */
+.skills-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.skills-dropdown.active {
+    display: block;
+}
+.skills-dropdown .skill-item {
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.1s;
+}
+.skills-dropdown .skill-item:hover {
+    background: #F2EDE8;
+}
+.skills-dropdown .skill-item:not(:last-child) {
+    border-bottom: 1px solid #F2EDE8;
+}
+
+/* Кнопки – единые */
+.filters button {
+    background: #4682B4;
+    color: #FFFFFF;
+    border: none;
+    padding: 0 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 500;
+    flex: 0 0 auto;
+}
+.filters button:hover {
+    background: #2C6B96;
+}
+.filters button#resetFilters {
+    background: #E8DCD4;
+    color: #2C3E50;
+}
+.filters button#resetFilters:hover {
+    background: #DDD0C8;
+}
+
+/* Чекбоксы – стилизованы как кнопки (тэги) */
+.filters label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2.6rem;
+    padding: 0 0.8rem;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    background: #FFFFFF;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #2C3E50;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Чекбокс "Стажировка" – розовый */
+.filters label:has(input#filterInternship) {
+    border-color: #ffadcf;
+    background: #fff5f8;
+}
+.filters label:has(input#filterInternship):has(input:checked) {
+    background: #ffadcf;
+    border-color: #e68aaf;
+    color: #2C3E50;
+}
+
+/* Чекбокс "Только с зарплатой" – нейтральный при активации */
+.filters label:has(input#filterHasSalary):has(input:checked) {
+    background: #F2EDE8;
+    border-color: #D0CBC6;
+}
+
+/* Скрываем стандартный чекбокс */
+.filters label input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+    accent-color: #4682B4;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.filters label:has(input#filterInternship) input[type="checkbox"] {
+    accent-color: #e68aaf;
+}
+
+/* Поля зарплаты – скрыты по умолчанию */
+#salaryRange {
+    display: none;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+#salaryRange.show {
+    display: flex;
+}
+#salaryRange input {
+    width: auto;
+    min-width: 80px;
+    flex: 0 1 100px;
+}
+
+/* ===== КАРТОЧКИ ВАКАНСИЙ (НЕ ИЗМЕНЕНЫ) ===== */
+/* Здесь уже есть ваши стили для vacancy-list, vacancy-card и т.д. – они остаются без изменений */
+/* (я их не трогаю, чтобы не нарушить ваши настройки) */
+/*------------------------------------------------------------------*/
+
+
+/*------------------------------------------------------------------*/
+/* Карточки вакансий */
+.vacancy-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+.vacancy-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    border: 1px solid #EDE9E4;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.2s;
+}
+.vacancy-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+.vacancy-card h4 {
+    font-size: 1.1rem;
+    margin: 0 0 0.2rem 0;
+    color: #2C3E50;
+    padding-block: inherit;
+}
+.vacancy-card .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.4rem;
+    margin:0.9 rem
+}
+/* Выделенные поля: компания, зарплата, опыт */
+.vacancy-card .meta .highlight {
+    background: #F2EDE8;
+    padding: 0.1rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #2f4353;
+    border: 1px solid #E8E3DE;
+    font-size: 0.8rem;
+}
+.vacancy-card .meta .highlight span {
+    color: #2C3E50;
+    font-weight: 400;
+}
+.vacancy-card .meta .internship-badge {
+    background: #ffadcf;
+    padding: 0 0.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #1f5185;
+}
+.vacancy-card .meta .date {
+    color: #7F8C8D;
+    font-size: 0.8rem;
+    margin-left: auto;
+}
+.vacancy-card .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 1rem 0;
+}
+.vacancy-card .skills span {
+    background: #F2EDE8;
+    padding: 0.1rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #2C3E50;
+}
+.vacancy-card .desc {
+    font-size: 0.95rem;
+    color: #2C3E50;
+    max-height: 4.5em;
+    overflow: hidden;
+    transition: max-height 0.3s;
+    line-height: 1.5;
+}
+.vacancy-card .desc p { margin: 0 0 0.3rem 0; }
+.vacancy-card .desc.expanded {
+    max-height: 500px;
+}
+.vacancy-card .desc-toggle {
+    color: #4682B4;
+    cursor: pointer;
+    font-size: 0.85rem;
+    border: none;
+    background: none;
+    padding: 0;
+    margin-top: 0.2rem;
+}
+.vacancy-card .desc-toggle:hover {
+    text-decoration: underline;
+}
+
+.loader {
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #7F8C8D;
+    font-size: 0.9rem;
+}
+
+
+/* ===== КАСТОМНЫЕ ВЫПАДАЮЩИЕ СПИСКИ ===== */
+.profession-wrapper,
+.experience-wrapper,
+.sort-wrapper {
+    position: relative;
+    height: 2.6rem;
+    flex: 0 1 180px;
+    max-width: 220px;
+    min-width: 120px;
+}
+
+.profession-wrapper input,
+.experience-wrapper input,
+.sort-wrapper input {
+    width: 100%;
+    height: 100%;
+    padding: 0 0.8rem;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    background: #FFFFFF;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #2C3E50;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.profession-wrapper input:focus,
+.experience-wrapper input:focus,
+.sort-wrapper input:focus {
+    border-color: #4682B4;
+    box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.15);
+}
+
+/* Выпадающие списки */
+.profession-dropdown,
+.experience-dropdown,
+.sort-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profession-dropdown.active,
+.experience-dropdown.active,
+.sort-dropdown.active {
+    display: block;
+}
+
+.profession-dropdown .profession-item,
+.experience-dropdown .experience-item,
+.sort-dropdown .sort-item {
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.1s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profession-dropdown .profession-item:hover,
+.experience-dropdown .experience-item:hover,
+.sort-dropdown .sort-item:hover {
+    background: #F2EDE8;
+}
+
+.profession-dropdown .profession-item:not(:last-child),
+.experience-dropdown .experience-item:not(:last-child),
+.sort-dropdown .sort-item:not(:last-child) {
+    border-bottom: 1px solid #F2EDE8;
+}
+
+.company-name {
+    color: #2e7d32 !important;
+    font-weight: 600;
+}
