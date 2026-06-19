@@ -26,10 +26,14 @@ async function loadProfessionGraph() {
         const resp = await fetch(url);
         const data = await resp.json();
         renderD3Graph(data);
+        // после рендера обновляем тултип с информацией о контексте
+        updateGraphContextInfo();
     } catch(e) {
         console.error('Profession graph error', e);
     }
 }
+
+
 
 function renderD3Graph(data) {
     const container = document.getElementById('profession-graph');
@@ -171,3 +175,38 @@ async function loadGraphGroups() {
     } catch(e) {}
 }
 loadGraphGroups();
+
+
+// Отображение текущего значения порога Жаккара
+document.getElementById('jaccardThreshold').addEventListener('input', function() {
+    const value = parseFloat(this.value).toFixed(2);
+    document.getElementById('jaccardValue').textContent = value;
+});
+
+// Функция обновления информации о контексте
+function updateGraphContextInfo() {
+    const info = document.getElementById('graph-context-info');
+    if (!info) return;
+    let text = '';
+    if (contextType === 'all') {
+        text = '🌐 Весь рынок';
+    } else if (contextType === 'group' && contextValue) {
+        text = `📁 Группа: ${contextValue}`;
+    } else if (contextType === 'profession' && contextValue) {
+        text = `💼 Профессия: ${contextValue}`;
+    }
+    info.textContent = text;
+}
+
+// Вызываем updateGraphContextInfo после загрузки графа
+// В loadProfessionGraph после renderD3Graph(data) добавить:
+// updateGraphContextInfo();
+
+// Также вызываем при начальной загрузке (после того как контекст установлен)
+// Можно повесить на событие переключения контекста, но проще вызвать при загрузке страницы.
+// Добавим в конец файла:
+
+// Инициализация: показать контекст при загрузке
+setTimeout(() => {
+    updateGraphContextInfo();
+}, 100);

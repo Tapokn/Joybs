@@ -27,6 +27,8 @@
     gap: 1rem;
     margin-top: 1rem;
     align-items: center;
+    justify-content: center;   /* центрируем по горизонтали */
+
 }
 .graph-controls label {
     font-size: 0.9rem;
@@ -38,4 +40,32 @@
     border-radius: 8px;
     min-height: 2rem;
     font-size: 0.95rem;
+}
+
+.graph-context-info {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #4682B4;
+    font-weight: 500;
+}
+
+/* Стиль для кнопки "Обновить граф" */
+#updateGraphBtn {
+    background: #4682B4;
+    color: #FFFFFF;
+    border: none;
+    padding: 0.4rem 1.5rem;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(70, 130, 180, 0.2);
+}
+#updateGraphBtn:hover {
+    background: #2C6B96;
+    transform: scale(1.02);
+}
+#updateGraphBtn:active {
+    transform: scale(0.97);
 }
