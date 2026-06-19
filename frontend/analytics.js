@@ -208,10 +208,15 @@ function renderMatrix(data, topN) {
     const container = document.getElementById('skills-matrix-container');
     container.innerHTML = '';
 
+    const minCooc = parseInt(document.getElementById('matrixMinCooc').value) || 5;
+
+    // Фильтруем рёбра по minCooc
     const edgeMap = {};
     data.edges.forEach(e => {
-        const key = [e.source, e.target].sort().join('|');
-        edgeMap[key] = e.weight;
+        if (e.weight >= minCooc) {
+            const key = [e.source, e.target].sort().join('|');
+            edgeMap[key] = e.weight;
+        }
     });
 
     const skillCount = {};
@@ -221,7 +226,7 @@ function renderMatrix(data, topN) {
     const topSkills = sortedSkills.slice(0, topN);
 
     if (topSkills.length === 0) {
-        container.innerHTML = '<p style="padding:20px;">Нет данных для отображения</p>';
+        container.innerHTML = '<p style="padding:20px; text-align:center;">Нет данных для отображения</p>';
         return;
     }
 
@@ -247,24 +252,34 @@ function renderMatrix(data, topN) {
     }
     if (maxWeight === 0) maxWeight = 1;
 
-    const width = container.clientWidth || 600;
-    const height = container.clientHeight || 500;
-    const margin = { top: 80, right: 80, bottom: 80, left: 80 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
+    const rect = container.getBoundingClientRect();
+    const width = rect.width || 600;
+    const height = rect.height || 600;
+
+    // Увеличиваем верхний отступ для вертикальных подписей
+    const viewBoxWidth = 1000;
+    const viewBoxHeight = 1000;
+    const margin = { top: 200, right: 50, bottom: 50, left: 100 };
+    const innerWidth = viewBoxWidth - margin.left - margin.right;
+    const innerHeight = viewBoxHeight - margin.top - margin.bottom;
+
     const cellSize = Math.min(innerWidth / N, innerHeight / N);
 
     const svg = d3.select(container)
         .append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .append('g')
-        .attr('transform', `translate(${margin.left},${margin.top})`);
+        .attr('width', '100%')
+        .attr('height', '100%')
+        .attr('viewBox', `0 0 ${viewBoxWidth} ${viewBoxHeight}`)
+        .style('background', '#FCFAF8');
 
     const colorScale = d3.scaleSequential(d3.interpolateBlues)
         .domain([0, maxWeight]);
 
-    const cells = svg.selectAll('rect')
+    const matrixGroup = svg.append('g')
+        .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+    // Ячейки
+    const cells = matrixGroup.selectAll('rect')
         .data(d3.cross(d3.range(N), d3.range(N)))
         .enter()
         .append('rect')
@@ -277,43 +292,54 @@ function renderMatrix(data, topN) {
             return val ? colorScale(val) : '#f5f5f5';
         })
         .style('stroke', '#ddd')
-        .style('stroke-width', 0.5);
+        .style('stroke-width', 0.5)
+        .style('cursor', 'pointer')
+        .style('transition', 'stroke 0.2s, stroke-width 0.2s');
 
-    cells.append('title')
-        .text(d => {
-            const i = d[0], j = d[1];
-            if (i === j) return topSkills[i];
-            return `${topSkills[i]} ↔ ${topSkills[j]}: ${matrix[i][j]}`;
-        });
-
+    // === ПОДПИСИ СВЕРХУ – ВЕРТИКАЛЬНЫЕ (поворот -90°) ===
+    // Адаптивный размер шрифта: при N=10 -> 1rem, при N=50 -> 0.6rem
+    const fontSize = Math.max(0.6, Math.min(1, 1 - (N - 10) * 0.01));
     svg.append('g')
         .selectAll('text')
         .data(topSkills)
         .enter()
         .append('text')
-        .attr('x', (d, i) => i * cellSize + cellSize/2)
-        .attr('y', -10)
-        .style('text-anchor', 'end')
-        .style('font-size', '10px')
-        .style('transform', 'rotate(-45deg)')
-        .style('transform-origin', (d, i) => `${i * cellSize + cellSize/2}px 0px`)
+        .attr('x', (d, i) => margin.left + i * cellSize + cellSize / 2)
+        .attr('y', margin.top - 10)
+        .style('text-anchor', 'start')
+        .style('font-size', fontSize + 'rem')
+        .style('font-weight', '500')
+        .style('fill', '#2C3E50')
+        .attr('transform', (d, i) => {
+            const x = margin.left + i * cellSize + cellSize / 2;
+            const y = margin.top - 10;
+            return `rotate(-90, ${x}, ${y})`;
+        })
+        .text(d => d.length > 15 ? d.slice(0, 12) + '…' : d)
+        .append('title')
         .text(d => d);
 
+    // === ПОДПИСИ СЛЕВА ===
     svg.append('g')
         .selectAll('text')
         .data(topSkills)
         .enter()
         .append('text')
-        .attr('y', (d, i) => i * cellSize + cellSize/2)
-        .attr('x', -10)
+        .attr('y', (d, i) => margin.top + i * cellSize + cellSize / 2)
+        .attr('x', margin.left - 16)
         .style('text-anchor', 'end')
-        .style('font-size', '10px')
+        .style('font-size', '1rem')
+        .style('font-weight', '500')
+        .style('fill', '#2C3E50')
+        .text(d => d.length > 15 ? d.slice(0, 12) + '…' : d)
+        .append('title')
         .text(d => d);
 
-    const legendWidth = 200;
-    const legendHeight = 20;
-    const legendX = (innerWidth - legendWidth) / 2;
-    const legendY = innerHeight + 30;
+    // === ЛЕГЕНДА (поднята выше, чтобы не перекрывать) ===
+    const legendWidth = Math.min(200, innerWidth * 0.5);
+    const legendHeight = 18;
+    const legendX = (viewBoxWidth - legendWidth) / 2;
+    const legendY = 20; // выше подписей
 
     const defs = svg.append('defs');
     const linearGradient = defs.append('linearGradient')
@@ -329,20 +355,127 @@ function renderMatrix(data, topN) {
         .attr('width', legendWidth)
         .attr('height', legendHeight)
         .style('fill', 'url(#legendGradient)')
-        .style('stroke', '#ccc');
+        .style('stroke', '#ccc')
+        .style('stroke-width', 0.5);
 
     svg.append('text')
         .attr('x', legendX)
-        .attr('y', legendY + legendHeight + 18)
-        .style('font-size', '10px')
+        .attr('y', legendY + legendHeight + 16)
+        .style('font-size', '0.9rem')
+        .style('text-anchor', 'start')
+        .style('fill', '#7F8C8D')
         .text('0');
 
     svg.append('text')
         .attr('x', legendX + legendWidth)
-        .attr('y', legendY + legendHeight + 18)
-        .style('font-size', '10px')
+        .attr('y', legendY + legendHeight + 16)
+        .style('font-size', '0.9rem')
         .style('text-anchor', 'end')
+        .style('fill', '#7F8C8D')
         .text(maxWeight);
+
+    svg.append('text')
+        .attr('x', legendX + legendWidth / 2)
+        .attr('y', legendY - 6)
+        .style('font-size', '0.9rem')
+        .style('text-anchor', 'middle')
+        .style('fill', '#7F8C8D')
+        .text('Совместная встречаемость');
+
+    // === ТУЛТИП ===
+    let tooltip = document.getElementById('matrix-hover-tooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'matrix-hover-tooltip';
+        tooltip.style.cssText = `
+            position: fixed;
+            pointer-events: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            max-width: 300px;
+            z-index: 10000;
+            border: 1px solid rgba(200,200,200,0.3);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+            color: #2C3E50;
+        `;
+        document.body.appendChild(tooltip);
+    }
+
+    function showTooltip(html, clientX, clientY) {
+        tooltip.innerHTML = html;
+        tooltip.style.opacity = '1';
+        tooltip.style.visibility = 'visible';
+        tooltip.style.transform = 'scale(1)';
+        const tw = tooltip.offsetWidth || 200;
+        const th = tooltip.offsetHeight || 50;
+        let left = clientX + 15;
+        let top = clientY + 15;
+        if (left + tw > window.innerWidth) {
+            left = clientX - tw - 15;
+        }
+        if (top + th > window.innerHeight) {
+            top = clientY - th - 15;
+        }
+        if (left < 0) left = 10;
+        if (top < 0) top = 10;
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function hideTooltip() {
+        tooltip.style.opacity = '0';
+        tooltip.style.visibility = 'hidden';
+        tooltip.style.transform = 'scale(0.95)';
+    }
+
+    // Обработчики для ячеек
+    cells.on('mouseover', function(event, d) {
+        const i = d[0], j = d[1];
+        const val = matrix[i][j];
+        const skillA = topSkills[i];
+        const skillB = topSkills[j];
+        let html = `<strong>${skillA}</strong> ↔ <strong>${skillB}</strong>`;
+        if (i === j) {
+            html = `<strong>${skillA}</strong> (диагональ)`;
+        } else {
+            html += `<br>Совместная встречаемость: <strong>${val}</strong>`;
+        }
+        showTooltip(html, event.clientX, event.clientY);
+        d3.select(this)
+            .style('stroke', '#FFA500')
+            .style('stroke-width', 2);
+    })
+    .on('mousemove', function(event) {
+        if (tooltip.style.visibility === 'visible') {
+            const tw = tooltip.offsetWidth || 200;
+            const th = tooltip.offsetHeight || 50;
+            let left = event.clientX + 15;
+            let top = event.clientY + 15;
+            if (left + tw > window.innerWidth) {
+                left = event.clientX - tw - 15;
+            }
+            if (top + th > window.innerHeight) {
+                top = event.clientY - th - 15;
+            }
+            if (left < 0) left = 10;
+            if (top < 0) top = 10;
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+    })
+    .on('mouseout', function() {
+        hideTooltip();
+        d3.select(this)
+            .style('stroke', '#ddd')
+            .style('stroke-width', 0.5);
+    });
 }
 
 document.getElementById('updateMatrixBtn').addEventListener('click', loadSkillsMatrix);

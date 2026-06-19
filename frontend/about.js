@@ -9,6 +9,7 @@ let graphGroup = null;
 let simulation = null;
 let zoomApplied = false;
 let fullscreenHandler = null;
+let cachedGraphData = null;           // кеш данных для перерисовки без запроса
 
 async function loadProfessionGraph() {
     let group = '';
@@ -38,11 +39,27 @@ async function loadProfessionGraph() {
 
     const threshold = parseFloat(document.getElementById('jaccardThreshold').value) || 0.1;
     const minVacancies = 1;
-    let url = `/api/graph/professions?threshold=${threshold}&min_vacancies=${minVacancies}`;
-    if (group) {
-        url += `&group=${encodeURIComponent(group)}`;
-    } else if (profession) {
-        url += `&profession=${encodeURIComponent(profession)}`;
+    const url = `/api/graph/professions?threshold=${threshold}&min_vacancies=${minVacancies}` +
+        (group ? `&group=${encodeURIComponent(group)}` : '') +
+        (profession ? `&profession=${encodeURIComponent(profession)}` : '');
+
+    // Формируем ключ кеша
+    const cacheKey = `${contextType}:${contextValue}:${threshold}`;
+    let data = null;
+
+    // Если есть кеш и ключ совпадает – используем его
+    if (cachedGraphData && cachedGraphData.cacheKey === cacheKey) {
+        data = cachedGraphData.data;
+        console.log('Using cached graph data');
+    } else {
+        try {
+            const resp = await fetch(url);
+            data = await resp.json();
+            cachedGraphData = { cacheKey, data };
+        } catch (e) {
+            console.error('Profession graph error', e);
+            return;
+        }
     }
 
     if (simulation) {
@@ -51,14 +68,8 @@ async function loadProfessionGraph() {
     }
     zoomApplied = false;
 
-    try {
-        const resp = await fetch(url);
-        const data = await resp.json();
-        renderD3Graph(data);
-        updateGraphContextInfo();
-    } catch (e) {
-        console.error('Profession graph error', e);
-    }
+    renderD3Graph(data);
+    updateGraphContextInfo();
 }
 
 async function findOptimalThreshold(profession) {
@@ -155,42 +166,34 @@ function renderD3Graph(data) {
         .attr('dy', 4)
         .style('pointer-events', 'none');
 
-    // ---- Всплывающий тултип ----
+    // ---- Всплывающий тултип (создаём один раз в body) ----
     let hoverTooltip = document.getElementById('graph-hover-tooltip');
     if (!hoverTooltip) {
         hoverTooltip = document.createElement('div');
         hoverTooltip.id = 'graph-hover-tooltip';
-        container.style.position = 'relative';
-        container.appendChild(hoverTooltip);
+        document.body.appendChild(hoverTooltip);
     }
 
-    // Кеши (храним полные списки)
+    // Кеши навыков для узлов и рёбер
     const nodeSkillsCache = {};
     const edgeSkillsCache = {};
 
-    // ---- Функция позиционирования ----
+    // ---- Функция позиционирования (fixed) ----
     function updateTooltipPosition(clientX, clientY) {
-        const rect = container.getBoundingClientRect();
         const tooltip = hoverTooltip;
         const tw = tooltip.offsetWidth;
         const th = tooltip.offsetHeight;
         if (tw === 0 || th === 0) return;
 
-        const containerWidth = rect.width;
-        const containerHeight = rect.height;
-
-        let desiredLeft = clientX - rect.left + 15;
-        let desiredTop = clientY - rect.top + 15;
-
         const maxLeftShift = tw / 2;
         const maxTopShift = th / 2;
 
-        let left = desiredLeft;
-        let top = desiredTop;
+        let left = clientX + 15;
+        let top = clientY + 15;
 
-        if (left + tw > containerWidth) {
-            let leftCandidate = clientX - rect.left - tw - 15;
-            const cursorLeft = clientX - rect.left;
+        if (left + tw > window.innerWidth) {
+            let leftCandidate = clientX - tw - 15;
+            const cursorLeft = clientX;
             const minLeft = cursorLeft - maxLeftShift;
             if (leftCandidate < minLeft) leftCandidate = minLeft;
             if (leftCandidate < 0) leftCandidate = 0;
@@ -198,9 +201,9 @@ function renderD3Graph(data) {
         }
         if (left < 0) left = 0;
 
-        if (top + th > containerHeight) {
-            let topCandidate = clientY - rect.top - th - 15;
-            const cursorTop = clientY - rect.top;
+        if (top + th > window.innerHeight) {
+            let topCandidate = clientY - th - 15;
+            const cursorTop = clientY;
             const minTop = cursorTop - maxTopShift;
             if (topCandidate < minTop) topCandidate = minTop;
             if (topCandidate < 0) topCandidate = 0;
@@ -264,7 +267,7 @@ function renderD3Graph(data) {
             .style('filter', 'none');
     }
 
-    // Подсветка выбранной
+    // Подсветка выбранной профессии
     if (selectedProf) {
         const targetNode = nodes.find(n => n.label === selectedProf);
         if (targetNode) {
@@ -276,7 +279,6 @@ function renderD3Graph(data) {
         }
     }
 
-    // ---- Статический тултип (под графом) – ВСЕ навыки ----
     function showStaticTooltip(d) {
         fetch(`/api/graph/profession/${encodeURIComponent(d.label)}/skills?limit=1000`)
             .then(resp => resp.json())
@@ -296,7 +298,6 @@ function renderD3Graph(data) {
         let content = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}`;
         
         if (!nodeSkillsCache[d.id]) {
-            // Первый раз – грузим все навыки, но показываем первые 10
             content += '<br>Загрузка навыков…';
             showHoverTooltip(content, event.clientX, event.clientY);
             hoverTooltip.dataset.nodeId = d.id;
@@ -306,7 +307,6 @@ function renderD3Graph(data) {
                 .then(skillsData => {
                     const allSkills = skillsData.map(s => s.skill);
                     nodeSkillsCache[d.id] = allSkills;
-                    // Если тултип всё ещё виден и это тот же узел – обновляем
                     if (hoverTooltip.classList.contains('visible') && hoverTooltip.dataset.nodeId == d.id) {
                         const display = allSkills.slice(0, 10);
                         let skillsStr = display.join(', ');
@@ -323,7 +323,6 @@ function renderD3Graph(data) {
                     }
                 });
         } else {
-            // Уже загружено
             const allSkills = nodeSkillsCache[d.id];
             const display = allSkills.slice(0, 10);
             let skillsStr = display.join(', ');
@@ -374,7 +373,6 @@ function renderD3Graph(data) {
                 .then(data => {
                     const allSkills = data.common_skills || [];
                     edgeSkillsCache[cacheKey] = allSkills;
-                    // Если тултип всё ещё виден и это то же ребро – обновляем
                     if (hoverTooltip.classList.contains('visible') && hoverTooltip.dataset.edgeKey == cacheKey) {
                         const display = allSkills.slice(0, 10);
                         let skillsStr = display.join(', ');
@@ -580,15 +578,16 @@ function renderD3Graph(data) {
         applyAutoZoom(nodes, width, height);
     };
 
-    // Полноэкранный режим
+    // ---- Полноэкранный режим (перерисовка с кешем) ----
     if (fullscreenHandler) {
         document.removeEventListener('fullscreenchange', fullscreenHandler);
         fullscreenHandler = null;
     }
     fullscreenHandler = function() {
-        setTimeout(() => loadProfessionGraph(), 100);
-        document.removeEventListener('fullscreenchange', fullscreenHandler);
-        fullscreenHandler = null;
+        // Даём браузеру время изменить размеры, затем перерисовываем граф из кеша
+        setTimeout(() => {
+            loadProfessionGraph();
+        }, 50);
     };
     document.addEventListener('fullscreenchange', fullscreenHandler);
 

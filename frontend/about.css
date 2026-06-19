@@ -109,9 +109,9 @@
     transition: stroke 0.2s, stroke-width 0.2s, filter 0.2s;
 }
 
-/* ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА (полупрозрачная) ===== */
+/* ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА (полупрозрачная, фиксированная) ===== */
 #graph-hover-tooltip {
-    position: absolute;
+    position: fixed;           /* теперь привязана к окну */
     pointer-events: none;
     border-radius: 8px;
     padding: 8px 14px;
@@ -120,7 +120,7 @@
     max-width: 300px;
     z-index: 10000;
     border: 1px solid rgba(200,200,200,0.3);
-    background: rgba(255, 255, 255, 0.7) !important; /* 70% прозрачности */
+    background: rgba(255, 255, 255, 0.7) !important;
     opacity: 0;
     visibility: hidden;
     transform: scale(0.95);

@@ -128,23 +128,25 @@
                 </div>
 
                 <div class="card" id="skills-matrix">
-                    <h3>Матрица совместной встречаемости навыков</h3>
-                    <div class="matrix-controls">
-                        <label>Топ навыков:
-                            <select id="matrixTopN">
-                                <option value="10">10</option>
-                                <option value="20" selected>20</option>
-                                <option value="30">30</option>
-                                <option value="50">50</option>
-                            </select>
-                        </label>
-                        <label>Мин. встречаемость:
-                            <input type="number" id="matrixMinCooc" value="5" min="1">
-                        </label>
-                        <button id="updateMatrixBtn">Обновить матрицу</button>
-                    </div>
-                    <div id="skills-matrix-container" class="matrix-container"></div>
-                </div>
+    <h3>Матрица совместной встречаемости навыков</h3>
+    <div class="matrix-controls">
+        <div class="matrix-control-group">
+            <label for="matrixTopN">Топ навыков</label>
+            <select id="matrixTopN">
+                <option value="10">10</option>
+                <option value="20" selected>20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+        <div class="matrix-control-group">
+            <label for="matrixMinCooc">Мин. встречаемость</label>
+            <input type="number" id="matrixMinCooc" value="5" min="1">
+        </div>
+        <button class="matrix-btn" id="updateMatrixBtn">Обновить матрицу</button>
+    </div>
+    <div id="skills-matrix-container" class="matrix-container"></div>
+</div>
             </section>
 
             <!-- ===== СЕКЦИЯ АГРЕГАТОР ===== -->
@@ -222,7 +224,6 @@
     <script src="about.js"></script>
     <script src="analytics.js"></script>
     <script src="aggregator.js"></script>
-    <div id="graph-hover-tooltip" style="display:none; position:fixed; pointer-events:none; background:rgba(255,255,255,0.95); border-radius:8px; padding:8px 14px; box-shadow:0 4px 16px rgba(0,0,0,0.15); font-size:0.9rem; max-width:300px; z-index:10000; backdrop-filter:blur(2px); border:1px solid rgba(200,200,200,0.3);"></div>
-
+    <!-- Тултип теперь создаётся в about.js, поэтому удаляем дублирующий элемент -->
 </body>
 </html>
