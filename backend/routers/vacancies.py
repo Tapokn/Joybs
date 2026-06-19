@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query, HTTPException
 from backend.database import get_db
+from backend.categories import get_profession_group
 import aiosqlite
 
 router = APIRouter()
@@ -60,6 +61,18 @@ async def get_professions():
     rows = await cursor.fetchall()
     await conn.close()
     return [row[0] for row in rows]
+
+# ===== НОВЫЙ ЭНДПОИНТ ДЛЯ ПОЛУЧЕНИЯ ПРОФЕССИЙ ПО ГРУППЕ =====
+@router.get("/vacancies/professions/by-group")
+async def get_professions_by_group(group: str = Query(...)):
+    """Возвращает список профессий, принадлежащих указанной группе."""
+    conn = await get_db()
+    cursor = await conn.execute("SELECT DISTINCT profession FROM vacancies")
+    rows = await cursor.fetchall()
+    await conn.close()
+    professions = [row[0] for row in rows]
+    filtered = [p for p in professions if get_profession_group(p) == group]
+    return filtered
 
 @router.get("/vacancies/{hh_id}")
 async def get_vacancy(hh_id: str):

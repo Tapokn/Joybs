@@ -1,5 +1,9 @@
 /* ===== Базовые сбросы ===== */
-* { box-sizing: border-box; margin: 0;}
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,30 +17,47 @@ body {
 
 /* ===== ХЭДЕР ===== */
 .header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     background: #FFFFFF;
     border-bottom: 1px solid #E8E3DE;
-    padding: 0.8rem 2rem;
+    padding: 0.8rem 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease;
 }
+.header--hidden {
+    transform: translateY(-100%);
+}
+
 .header__inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     max-width: 1400px;
     margin: 0 auto;
-    flex-wrap: wrap;
+    padding: 0 1.5rem;
+    position: relative;
 }
+
+/* Логотип слева */
 .header__logo {
     font-weight: 700;
     font-size: 1.6rem;
     color: #4682B4;
     text-decoration: none;
     letter-spacing: -0.5px;
+    flex-shrink: 0;
+    margin-right: 2rem;
 }
+
+/* Навигация по центру */
 .header__nav {
     display: flex;
+    justify-content: center;
     gap: 1.5rem;
+    flex: 1;
 }
+
 .header__tab {
     padding: 0.5rem 1.2rem;
     border: none;
@@ -46,6 +67,7 @@ body {
     color: #7F8C8D;
     cursor: pointer;
     transition: 0.2s;
+    white-space: nowrap;
 }
 .header__tab:hover {
     background: #F2EDE8;
@@ -59,103 +81,146 @@ body {
 /* ===== ОСНОВНАЯ СЕТКА ===== */
 .page {
     display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 1.5rem;
+    grid-template-columns: auto 1fr auto;  /* ← ИСПРАВЛЕНО: авто-ширина для панелей */
+    gap: 0;
     max-width: 1400px;
     margin: 1.5rem auto;
-    padding: 0 1rem;
+    padding: 0 1.5rem;
     flex: 1;
-}
-.page__left {
-    width: 180px;
-}
-.page__right {
-    width: 140px;
-    align-self: start;
-}
-.page__main {
-    min-width: 0;
+    width: 100%;
 }
 
-/* ===== ЛЕВАЯ ПАНЕЛЬ ===== */
+/* Левая панель – контекстные табы */
+.page__left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 1rem;
+    overflow: visible;
+    position: relative;
+    width: auto; /* ширина, когда отображается */
+    min-width: 0rem;           /* ← добавили */
+
+}
+
+/* Правая панель – якоря */
+.page__right {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 1rem;
+    overflow: visible;
+    position: relative;
+    width: auto;
+    min-width: 0rem;           /* ← добавили */
+
+}
+
+/* Основной контент */
+.page__main {
+    min-width: 0;
+    padding: 0 1.5rem;
+}
+
+/* ===== ЛЕВАЯ ПАНЕЛЬ (контекст) ===== */
 .context-tabs {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    align-items: flex-end;
 }
+
 .context-tab {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    padding: 1rem 0.6rem;
+    padding: 0.8rem 0.25rem;
     border: none;
-    border-radius: 12px 0 0 12px;
+    border-radius: 8px 0 0 8px;
     background: #F2EDE8;
     color: #7F8C8D;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
-    transition: 0.2s;
+    transition: transform 0.2s, background 0.2s;
     text-align: center;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    width: 2rem;
+    min-width: 2rem;
+    max-width: 2rem;
+    box-sizing: border-box;
+    line-height: 1.2;
 }
 .context-tab:hover {
     background: #E8DCD4;
+    transform: translateX(0.4rem) rotate(180deg);
 }
 .context-tab--active {
     background: #FFED75;
     color: #2C3E50;
 }
+
 .context-selector {
     margin-top: 1rem;
     background: #FFFFFF;
-    padding: 1rem;
+    padding: 0.8rem;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 200px;
 }
 .context-selector input {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.4rem;
     border: 1px solid #E8E3DE;
     border-radius: 8px;
     margin-bottom: 0.5rem;
+    font-size: 0.85rem;
 }
 .context-selector button {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.4rem;
     background: #4682B4;
     color: #fff;
     border: none;
     border-radius: 30px;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 0.85rem;
 }
 .context-selector button:hover {
     background: #2C6B96;
 }
 
-/* ===== ПРАВАЯ ПАНЕЛЬ ===== */
+/* ===== ПРАВАЯ ПАНЕЛЬ (якоря) ===== */
 .anchor-tabs {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    align-items: flex-start;
 }
+
 .anchor-tab {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    padding: 0.8rem 0.5rem;
-    border-radius: 0 12px 12px 0;
+    padding: 0.8rem 0.25rem;
+    border-radius: 0 8px 8px 0;
     background: #F2EDE8;
     color: #7F8C8D;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 500;
-    transition: 0.2s;
+    transition: transform 0.2s, background 0.2s;
     text-align: center;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    width: 2rem;
+    min-width: 2rem;
+    max-width: 2rem;
+    box-sizing: border-box;
+    line-height: 1.2;
 }
 .anchor-tab:hover {
     background: #E8DCD4;
-    color: #2C3E50;
+    transform: translateX(-0.4rem) rotate(180deg);
 }
 
 /* ===== СЕКЦИИ ===== */
@@ -202,6 +267,7 @@ body {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 1rem;
+    padding: 0 1.5rem;
 }
 .footer__sitemap {
     display: flex;
@@ -221,31 +287,43 @@ body {
     font-size: 0.85rem;
 }
 
+/* ===== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ===== */
+#salaryRange {
+    display: none;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+#salaryRange.show {
+    display: flex;
+}
+
 /* ===== АДАПТИВ ===== */
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .page {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        padding: 0 1rem;
     }
-    .page__left, .page__right {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+    .page__left,
+    .page__right {
+        display: none !important;
     }
-    .context-tabs, .anchor-tabs {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    .context-tab, .anchor-tab {
-        writing-mode: horizontal-tb;
-        transform: none;
-        padding: 0.4rem 1rem;
-        border-radius: 30px;
+    .page__main {
+        padding: 0;
     }
     .header__inner {
-        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 0.5rem;
+    }
+    .header__logo {
+        margin-right: 0;
+        flex-basis: 100%;
+        text-align: center;
+    }
+    .header__nav {
+        flex-wrap: wrap;
+        justify-content: center;
     }
     .footer__inner {
         flex-direction: column;
@@ -253,13 +331,106 @@ body {
     }
 }
 
-/* ===== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ===== */
-#salaryRange {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    align-items: center;
+@media (max-width: 600px) {
+    .header__tab {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.8rem;
+    }
+    .section__title {
+        font-size: 1.5rem;
+    }
+    .card {
+        padding: 1rem;
+    }
+    .header__inner {
+        padding: 0 0.8rem;
+    }
+    .page {
+        padding: 0 0.8rem;
+    }
 }
-#salaryRange.show {
-    display: flex;
+
+@media (max-width: 992px) {
+    .page {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+    }
+    .page__left,
+    .page__right {
+        display: none !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+    }
+    .page__main {
+        padding: 0;
+    }
+    /* ... остальное ... */
+}
+/* ===== КОНТЕКСТНОЕ ВЫПАДАЮЩЕЕ МЕНЮ ===== */
+.context-tabs {
+    position: relative; /* для позиционирования меню */
+}
+
+.context-dropdown {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 8px); /* справа от кнопки */
+    background: #FFFFFF;
+    border: 1px solid #E8E3DE;
+    border-radius: 8px;
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+}
+.context-dropdown.active {
+    display: block;
+}
+
+/* Элементы списка (группы/профессии) */
+.context-dropdown .context-item {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.1s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.context-dropdown .context-item:hover {
+    background: #F2EDE8;
+}
+.context-dropdown .context-item:not(:last-child) {
+    border-bottom: 1px solid #F2EDE8;
+}
+
+/* Поле ввода для профессии */
+.context-dropdown .context-input-wrapper {
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1px solid #F2EDE8;
+}
+.context-dropdown .context-input-wrapper input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #E8E3DE;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+.context-dropdown .context-input-wrapper input:focus {
+    border-color: #4682B4;
+    box-shadow: 0 0 0 2px rgba(70, 130, 180, 0.15);
+    outline: none;
+}
+
+/* Подсказка в меню */
+.context-dropdown .context-hint {
+    padding: 0.6rem 1rem;
+    color: #7F8C8D;
+    font-size: 0.85rem;
+    text-align: center;
 }

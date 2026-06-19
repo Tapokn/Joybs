@@ -146,8 +146,6 @@ function filterVacancies() {
 // ========== Динамические списки ==========
 
 // ----- КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК ДЛЯ КОМПАНИЙ -----
-let companiesData = [];
-let selectedCompany = '';
 
 function updateCompaniesList(vacancies) {
     const input = document.getElementById('filterCompanyInput');
@@ -234,8 +232,6 @@ document.addEventListener('click', function(e) {
 });
 
 // ----- КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК ДЛЯ РОЛЕЙ (PROFESSION) -----
-let professionsData = [];
-let selectedProfession = '';
 
 // ДИНАМИЧЕСКОЕ ОБНОВЛЕНИЕ СПИСКА ПРОФЕССИЙ
 function updateProfessionsList(filtered) {
@@ -322,8 +318,6 @@ if (professionInput) {
 }
 
 // ----- КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК ДЛЯ ОПЫТА -----
-let experienceData = [];
-let selectedExperience = '';
 
 function updateExperienceList(vacancies) {
     const expSet = new Set();
@@ -407,12 +401,7 @@ if (experienceInput) {
 }
 
 // ----- КАСТОМНЫЙ ВЫПАДАЮЩИЙ СПИСОК ДЛЯ СОРТИРОВКИ -----
-const sortOptions = [
-    { value: 'relevance', label: 'По релевантности' },
-    { value: 'date', label: 'По новизне' },
-    { value: 'salary', label: 'По зарплате' }
-];
-let selectedSort = 'relevance';
+
 
 function updateSortDropdown() {
     const input = document.getElementById('filterSortInput');
