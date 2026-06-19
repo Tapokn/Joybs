@@ -17,11 +17,11 @@ let pieChart, medianBarChart, histogramChart, workFormatChart, experienceChart, 
 // ========== ПЕРЕМЕННЫЕ ДЛЯ КОНТЕКСТНОГО МЕНЮ ==========
 const contextTabs = document.querySelectorAll('.context-tab');
 const contextDropdown = document.getElementById('contextDropdown');
+const contextDropdownMobile = document.getElementById('contextDropdownMobile');
 let groupsData = [];
 let professionsData = [];
 
 // ========== ПЕРЕМЕННЫЕ ДЛЯ АГРЕГАТОРА (общие) ==========
-// (будут использоваться в aggregator.js, но объявлены здесь, чтобы избежать дублирования)
 let companiesData = [];
 let selectedCompany = '';
 let selectedProfession = '';
@@ -51,7 +51,7 @@ document.querySelectorAll('.header__tab').forEach(btn => {
         if (tab === 'about' || tab === 'analytics') {
             document.getElementById('leftPanel').style.display = '';
             document.getElementById('rightPanel').style.display = '';
-            renderAnchors(tab); 
+            renderAnchors(tab);
         } else {
             document.getElementById('leftPanel').style.display = 'none';
             document.getElementById('rightPanel').style.display = 'none';
@@ -62,13 +62,14 @@ document.querySelectorAll('.header__tab').forEach(btn => {
             loadAnalytics();
         } else if (tab === 'aggregator') {
             if (allVacancies.length === 0) {
-                loadAllVacancies();  // определена в aggregator.js
+                loadAllVacancies();
             } else {
-                applyFiltersAndRender();  // определена в aggregator.js
+                applyFiltersAndRender();
             }
         }
-        // Скрываем выпадающее меню при переключении вкладки
         closeContextDropdown();
+        // Обновляем мобильное меню
+        updateMobileMenu(tab);
     });
 });
 
@@ -77,7 +78,6 @@ renderAnchors('about');
 
 // ========== КОНТЕКСТ (левая панель) ==========
 
-// Загрузка групп
 async function loadGroups() {
     if (groupsData.length) return groupsData;
     try {
@@ -91,7 +91,6 @@ async function loadGroups() {
     }
 }
 
-// Загрузка профессий
 async function loadProfessions() {
     if (professionsData.length) return professionsData;
     try {
@@ -104,23 +103,34 @@ async function loadProfessions() {
     }
 }
 
-// Закрыть dropdown
+// ========== ОБЩАЯ ФУНКЦИЯ ЗАКРЫТИЯ DROPDOWN ==========
 function closeContextDropdown() {
-    if (contextDropdown) {
-        contextDropdown.classList.remove('active');
-        contextDropdown.innerHTML = '';
-    }
+    const dropdowns = document.querySelectorAll('.context-dropdown');
+    dropdowns.forEach(d => d.classList.remove('active'));
+    document.getElementById('dropdownOverlay').classList.remove('active');
 }
 
-// Показать dropdown для группы
-async function showGroupDropdown() {
+// Закрытие по клику на оверлей
+document.getElementById('dropdownOverlay').addEventListener('click', closeContextDropdown);
+
+// Закрытие при изменении размера окна (если стало десктопом)
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 992) {
+        closeContextDropdown();
+    }
+});
+
+// ========== ПОКАЗ DROPDOWN ДЛЯ ГРУПП ==========
+async function showGroupDropdown(targetDropdown) {
+    const dropdown = targetDropdown || contextDropdown;
     const groups = await loadGroups();
+    dropdown.innerHTML = '';
     if (!groups.length) {
-        contextDropdown.innerHTML = '<div class="context-hint">Нет групп</div>';
-        contextDropdown.classList.add('active');
+        dropdown.innerHTML = '<div class="context-hint">Нет групп</div>';
+        dropdown.classList.add('active');
+        if (window.innerWidth <= 992) document.getElementById('dropdownOverlay').classList.add('active');
         return;
     }
-    contextDropdown.innerHTML = '';
     groups.forEach(group => {
         const item = document.createElement('div');
         item.className = 'context-item';
@@ -128,15 +138,17 @@ async function showGroupDropdown() {
         item.addEventListener('click', function(e) {
             e.stopPropagation();
             selectContextGroup(group);
+            closeContextDropdown();
         });
-        contextDropdown.appendChild(item);
+        dropdown.appendChild(item);
     });
-    contextDropdown.classList.add('active');
+    dropdown.classList.add('active');
+    if (window.innerWidth <= 992) document.getElementById('dropdownOverlay').classList.add('active');
 }
 
-// Показать dropdown для профессии
-// Показать dropdown для профессии
-async function showProfessionDropdown() {
+// ========== ПОКАЗ DROPDOWN ДЛЯ ПРОФЕССИИ ==========
+async function showProfessionDropdown(targetDropdown) {
+    const dropdown = targetDropdown || contextDropdown;
     let professions = [];
     if (contextType === 'group' && contextValue) {
         try {
@@ -150,8 +162,7 @@ async function showProfessionDropdown() {
         professions = await loadProfessions();
     }
 
-    contextDropdown.innerHTML = '';
-    // Поле ввода
+    dropdown.innerHTML = '';
     const wrapper = document.createElement('div');
     wrapper.className = 'context-input-wrapper';
     const input = document.createElement('input');
@@ -168,16 +179,16 @@ async function showProfessionDropdown() {
             const val = this.value.trim();
             if (val) {
                 selectContextProfession(val);
+                closeContextDropdown();
             }
         }
     });
     wrapper.appendChild(input);
-    contextDropdown.appendChild(wrapper);
+    dropdown.appendChild(wrapper);
 
-    // Контейнер для списка профессий
     const listContainer = document.createElement('div');
     listContainer.className = 'context-profession-list';
-    contextDropdown.appendChild(listContainer);
+    dropdown.appendChild(listContainer);
 
     function renderProfessionItems(items, searchVal) {
         listContainer.innerHTML = '';
@@ -192,51 +203,33 @@ async function showProfessionDropdown() {
             const item = document.createElement('div');
             item.className = 'context-item';
             item.textContent = prof;
-            // Используем mousedown с preventDefault, чтобы обработать до потери фокуса
             item.addEventListener('mousedown', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Выбрана профессия:', prof); // отладка
                 selectContextProfession(prof);
+                closeContextDropdown();
             });
             listContainer.appendChild(item);
         });
     }
 
     renderProfessionItems(professions, '');
-    contextDropdown.classList.add('active');
+    dropdown.classList.add('active');
+    if (window.innerWidth <= 992) document.getElementById('dropdownOverlay').classList.add('active');
     setTimeout(() => input.focus(), 50);
 }
 
-// Выбор профессии (убедитесь, что функция существует и вызывает applyContext)
-function selectContextProfession(prof) {
-    contextValue = prof;
-    contextType = 'profession';
-    contextTabs.forEach(tab => {
-        tab.classList.toggle('context-tab--active', tab.dataset.context === 'profession');
-    });
-    closeContextDropdown();
-    // Принудительно применяем контекст
-    applyContext();
-    console.log('Контекст применён: профессия =', contextValue);
-}
-
-// Выбор группы
+// ========== ВЫБОР КОНТЕКСТА ==========
 function selectContextGroup(group) {
     contextValue = group;
     contextType = 'group';
     contextTabs.forEach(tab => {
         tab.classList.toggle('context-tab--active', tab.dataset.context === 'group');
     });
-    const graphGroupFilter = document.getElementById('graphGroupFilter');
-    if (graphGroupFilter) {
-        graphGroupFilter.value = group;
-    }
     closeContextDropdown();
     applyContext();
 }
 
-// Выбор профессии
 function selectContextProfession(prof) {
     contextValue = prof;
     contextType = 'profession';
@@ -245,9 +238,9 @@ function selectContextProfession(prof) {
     });
     closeContextDropdown();
     applyContext();
+    console.log('Контекст применён: профессия =', contextValue);
 }
 
-// Применение контекста
 function applyContext() {
     if (currentTab === 'analytics') loadAnalytics();
     if (currentTab === 'about') loadProfessionGraph();
@@ -256,53 +249,54 @@ function applyContext() {
     }
 }
 
-// Обработчики кликов на кнопки контекста
+// ========== ОБРАБОТЧИКИ КОНТЕКСТНЫХ ТАБОВ ==========
 contextTabs.forEach(tab => {
     tab.addEventListener('click', function(e) {
         e.stopPropagation();
         const type = this.dataset.context;
-        if (this.classList.contains('context-tab--active') && contextDropdown.classList.contains('active')) {
+
+        // Если уже активен и открыт dropdown – закрываем
+        if (this.classList.contains('context-tab--active') && 
+            (contextDropdown.classList.contains('active') || contextDropdownMobile.classList.contains('active'))) {
             closeContextDropdown();
             return;
         }
+
         if (type === 'all') {
             contextType = 'all';
             contextValue = '';
             contextTabs.forEach(t => t.classList.remove('context-tab--active'));
             this.classList.add('context-tab--active');
             closeContextDropdown();
-            // Очищаем селектор графа, если он ещё существует (для безопасности)
-            const graphGroupFilter = document.getElementById('graphGroupFilter');
-            if (graphGroupFilter) {
-                graphGroupFilter.value = '';
-            }
             applyContext();
             return;
         }
+
         if (type === 'group') {
-            if (contextDropdown.classList.contains('active')) {
-                closeContextDropdown();
+            if (window.innerWidth <= 992) {
+                showGroupDropdown(contextDropdownMobile);
+            } else {
+                showGroupDropdown(contextDropdown);
             }
-            showGroupDropdown();
         } else if (type === 'profession') {
-            if (contextDropdown.classList.contains('active')) {
-                closeContextDropdown();
+            if (window.innerWidth <= 992) {
+                showProfessionDropdown(contextDropdownMobile);
+            } else {
+                showProfessionDropdown(contextDropdown);
             }
-            showProfessionDropdown();
         }
     });
 });
 
-// Закрытие dropdown при клике вне его
+// Закрытие dropdown при клике вне контекстных табов
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.context-tabs')) {
+    if (!e.target.closest('.context-tabs') && !e.target.closest('.header__context')) {
         closeContextDropdown();
     }
 });
 
-// ========== СТАРЫЙ КОНТЕКСТНЫЙ СЕЛЕКТОР (оставляем для совместимости) ==========
+// ========== СТАРЫЙ КОНТЕКСТНЫЙ СЕЛЕКТОР (скрыт) ==========
 document.getElementById('contextSelector').style.display = 'none';
-
 document.getElementById('applyContext').addEventListener('click', function() {
     contextValue = document.getElementById('contextValue').value.trim();
     if (currentTab === 'analytics') loadAnalytics();
@@ -322,6 +316,7 @@ window.addEventListener('scroll', () => {
     }
     lastScrollY = currentScrollY;
 });
+
 // ========== ПРАВАЯ ПАНЕЛЬ – ЯКОРЯ ==========
 function getAnchorsForTab(tab) {
     const anchors = {
@@ -352,7 +347,6 @@ function renderAnchors(tab) {
     if (!container) return;
     const anchors = getAnchorsForTab(tab);
     container.innerHTML = '';
-    
     anchors.forEach(a => {
         const link = document.createElement('a');
         link.href = a.target;
@@ -367,8 +361,6 @@ function renderAnchors(tab) {
         });
         container.appendChild(link);
     });
-
-    // Добавляем класс в зависимости от количества якорей
     const count = anchors.length;
     container.classList.remove('few', 'many');
     if (count <= 4) {
@@ -376,5 +368,77 @@ function renderAnchors(tab) {
     } else {
         container.classList.add('many');
     }
-
 }
+
+// ========== МОБИЛЬНОЕ МЕНЮ ==========
+const burgerBtn = document.getElementById('burgerBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const closeMenuBtn = document.getElementById('closeMenuBtn');
+const mobileMenuSections = document.querySelectorAll('.mobile-menu__section');
+const mobileMenuAnchors = document.querySelector('.mobile-menu__anchors');
+
+function openMobileMenu() {
+    mobileMenu.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    updateMobileMenu(currentTab);
+}
+
+function closeMobileMenu() {
+    mobileMenu.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+burgerBtn.addEventListener('click', openMobileMenu);
+closeMenuBtn.addEventListener('click', closeMobileMenu);
+mobileMenu.addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('mobile-menu__overlay')) {
+        closeMobileMenu();
+    }
+});
+
+function updateMobileMenu(tab) {
+    mobileMenuSections.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    const anchors = getAnchorsForTab(tab);
+    mobileMenuAnchors.innerHTML = '';
+    anchors.forEach(a => {
+        const btn = document.createElement('button');
+        btn.className = 'mobile-menu__anchor';
+        btn.textContent = a.label;
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(a.target);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                closeMobileMenu();
+            }
+        });
+        mobileMenuAnchors.appendChild(btn);
+    });
+}
+
+mobileMenuSections.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        const headerTab = document.querySelector(`.header__tab[data-tab="${tab}"]`);
+        if (headerTab) {
+            headerTab.click();
+        }
+        closeMobileMenu();
+    });
+});
+
+// Обновляем мобильное меню при переключении вкладок через MutationObserver
+const headerTabs = document.querySelectorAll('.header__tab');
+headerTabs.forEach(tab => {
+    const observer = new MutationObserver(() => {
+        if (tab.classList.contains('header__tab--active')) {
+            updateMobileMenu(tab.dataset.tab);
+        }
+    });
+    observer.observe(tab, { attributes: true, attributeFilter: ['class'] });
+});
+
+// Инициализация
+updateMobileMenu('about');

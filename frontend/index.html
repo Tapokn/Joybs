@@ -24,8 +24,43 @@
                 <button class="header__tab" data-tab="analytics">Аналитика</button>
                 <button class="header__tab" data-tab="aggregator">Агрегатор</button>
             </nav>
+
+            <!-- Контекстные табы (только для мобильных) -->
+            <div class="header__context">
+                <button class="context-tab context-tab--active" data-context="all">Весь рынок</button>
+                <button class="context-tab" data-context="group">Группа</button>
+                <button class="context-tab" data-context="profession">Профессия</button>
+                <div class="context-dropdown" id="contextDropdownMobile"></div>
+            </div>
+
+            <!-- Бургер -->
+            <button class="header__burger" id="burgerBtn" aria-label="Меню">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
+
+    <!-- Оверлей для мобильного dropdown -->
+    <div class="dropdown-overlay" id="dropdownOverlay"></div>
+
+    <!-- Мобильное меню -->
+    <div id="mobileMenu" class="mobile-menu">
+        <div class="mobile-menu__overlay"></div>
+        <div class="mobile-menu__panel">
+            <div class="mobile-menu__header">
+                <span class="mobile-menu__title">Навигация</span>
+                <button class="mobile-menu__close" id="closeMenuBtn">&times;</button>
+            </div>
+            <nav class="mobile-menu__sections">
+                <button class="mobile-menu__section active" data-tab="about">О проекте</button>
+                <button class="mobile-menu__section" data-tab="analytics">Аналитика</button>
+                <button class="mobile-menu__section" data-tab="aggregator">Агрегатор</button>
+            </nav>
+            <div class="mobile-menu__anchors"></div>
+        </div>
+    </div>
 
     <!-- ========== ОСНОВНОЙ КОНТЕНТ ========== -->
     <div class="page">
@@ -50,7 +85,7 @@
             <!-- ===== СЕКЦИЯ О ПРОЕКТЕ ===== -->
             <section class="section section--active" id="section-about">
                 <h2 class="section__title">О проекте</h2>
-                <div class="card"  id="about-text">
+                <div class="card" id="about-text">
                     <p><strong>Joybs</strong> – платформа для студентов и начинающих IT-специалистов. Мы помогаем анализировать рынок, находить востребованные навыки и строить карьерный путь на основе данных.</p>
                     <p><strong>Стек:</strong> Python + FastAPI, SQLite, Chart.js, D3.js.</p>
                     <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам, частота навыков, влияние навыков на зарплату, коэффициент Жаккара для сходства профессий.</p>
@@ -79,7 +114,7 @@
                     </div>
                     <div id="graph-tooltip" class="graph-tooltip"></div>
                 </div>
-            </section> <!-- ← ЗАКРЫТИЕ СЕКЦИИ ABOUT -->
+            </section>
 
             <!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
             <section class="section" id="section-analytics">
@@ -128,25 +163,25 @@
                 </div>
 
                 <div class="card" id="skills-matrix">
-    <h3>Матрица совместной встречаемости навыков</h3>
-    <div class="matrix-controls">
-        <div class="matrix-control-group">
-            <label for="matrixTopN">Топ навыков</label>
-            <select id="matrixTopN">
-                <option value="10">10</option>
-                <option value="20" selected>20</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-            </select>
-        </div>
-        <div class="matrix-control-group">
-            <label for="matrixMinCooc">Мин. встречаемость</label>
-            <input type="number" id="matrixMinCooc" value="5" min="1">
-        </div>
-        <button class="matrix-btn" id="updateMatrixBtn">Обновить матрицу</button>
-    </div>
-    <div id="skills-matrix-container" class="matrix-container"></div>
-</div>
+                    <h3>Матрица совместной встречаемости навыков</h3>
+                    <div class="matrix-controls">
+                        <div class="matrix-control-group">
+                            <label for="matrixTopN">Топ навыков</label>
+                            <select id="matrixTopN">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="matrix-control-group">
+                            <label for="matrixMinCooc">Мин. встречаемость</label>
+                            <input type="number" id="matrixMinCooc" value="5" min="1">
+                        </div>
+                        <button class="matrix-btn" id="updateMatrixBtn">Обновить матрицу</button>
+                    </div>
+                    <div id="skills-matrix-container" class="matrix-container"></div>
+                </div>
             </section>
 
             <!-- ===== СЕКЦИЯ АГРЕГАТОР ===== -->
@@ -194,9 +229,7 @@
 
         <!-- Правая панель – якоря -->
         <aside class="page__right" id="rightPanel">
-            <nav class="anchor-tabs">
-                
-            </nav>
+            <nav class="anchor-tabs"></nav>
         </aside>
 
     </div>
@@ -218,12 +251,11 @@
             <div class="footer__copy">© 2026 Joybs. Данные с hh.ru.</div>
         </div>
     </footer>
-    
+
     <!-- Подключаем JS (порядок важен) -->
     <script src="common.js"></script>
     <script src="about.js"></script>
     <script src="analytics.js"></script>
     <script src="aggregator.js"></script>
-    <!-- Тултип теперь создаётся в about.js, поэтому удаляем дублирующий элемент -->
 </body>
 </html>

@@ -4,7 +4,6 @@
     margin: 0;
 }
 
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #F9F7F5;
@@ -13,8 +12,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow-x: hidden;   /* ← запрещаем горизонтальную прокрутку */
-
+    overflow-x: hidden;
 }
 
 /* ===== ХЭДЕР ===== */
@@ -37,11 +35,10 @@ body {
     align-items: center;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
     position: relative;
 }
 
-/* Логотип слева */
 .header__logo {
     font-weight: 700;
     font-size: 1.6rem;
@@ -52,7 +49,6 @@ body {
     margin-right: 2rem;
 }
 
-/* Навигация по центру */
 .header__nav {
     display: flex;
     justify-content: center;
@@ -80,10 +76,36 @@ body {
     font-weight: 500;
 }
 
+/* Контекстные табы в хедере – скрыты на десктопе */
+.header__context {
+    display: none;
+}
+
+/* Бургер – скрыт на десктопе */
+.header__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 22px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: auto;
+}
+.header__burger span {
+    display: block;
+    height: 3px;
+    background: #2C3E50;
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
 /* ===== ОСНОВНАЯ СЕТКА ===== */
 .page {
     display: grid;
-    grid-template-columns: auto 1fr auto;  /* ← ИСПРАВЛЕНО: авто-ширина для панелей */
+    grid-template-columns: auto 1fr auto;
     gap: 0;
     max-width: 1400px;
     margin: 1.5rem auto;
@@ -92,8 +114,6 @@ body {
     width: 100%;
 }
 
-/* Левая панель – контекстные табы */
-/* Левая панель – контекстные табы */
 .page__left {
     position: sticky;
     top: 3rem;
@@ -104,15 +124,15 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    background: transparent;  /* чтобы не перекрывать контент */
+    background: transparent;
 }
 
 .context-tabs {
     display: flex;
     flex-direction: column;
-    justify-content: space-around; /* распределяем табы по высоте */
+    justify-content: space-around;
     height: 100%;
-    align-items: flex-start;      /* табы прижаты к левому краю */
+    align-items: flex-start;
     position: relative;
     pointer-events: auto;
 }
@@ -129,30 +149,26 @@ body {
     cursor: pointer;
     transition: transform 0.2s, background 0.2s;
     text-align: center;
-    margin-left: -10rem;        /* выступ влево на полную ширину */
-    padding-left: 12.5rem;        /* чтобы текст был виден */
+    margin-left: -10rem;
+    padding-left: 12.5rem;
     box-sizing: border-box;
     line-height: 1.2;
     flex-shrink: 0;
     box-shadow: 2px 0 6px rgba(0,0,0,0.05);
 }
-
 .context-tab:hover {
     background: #E8DCD4;
-    transform: translateX(0.6rem) 
+    transform: translateX(0.6rem);
 }
 .context-tab--active {
     background: #FFED75;
     color: #2C3E50;
 }
 
-
-/* Основной контент */
 .page__main {
     min-width: 0;
     padding: 0 1.5rem;
 }
-
 
 .context-selector {
     margin-top: 1rem;
@@ -186,7 +202,7 @@ body {
     background: #2C6B96;
 }
 
-/* ===== ПРАВАЯ ПАНЕЛЬ (якоря) ===== */
+/* ===== ПРАВАЯ ПАНЕЛЬ ===== */
 .page__right {
     position: sticky;
     top: 3rem;
@@ -209,7 +225,6 @@ body {
     pointer-events: auto;
 }
 
-/* Базовый стиль для всех табов */
 .anchor-tab {
     border: none;
     border-radius: 10px 0 0 10px;
@@ -222,15 +237,12 @@ body {
     flex-shrink: 0;
     box-shadow: -2px 0 6px rgba(0,0,0,0.05);
     text-decoration: none;
-    color: #7F8C8D;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1.2;
     text-align: center;
 }
-
-/* Режим "мало" (о проекте) – широкие, вертикальный текст, как левые табы */
 .anchor-tabs.few .anchor-tab {
     writing-mode: vertical-RL;
     padding: 3.2rem 1rem;
@@ -239,48 +251,24 @@ body {
     padding-right: 8rem;
     min-width: 3rem;
     max-width: 4rem;
-    border-radius: 10px 0 0 10px;
 }
-
-/* Режим "много" (аналитика) – узкие, горизонтальный текст, компактно */
 .anchor-tabs.many .anchor-tab {
     writing-mode: horizontal-tb;
     padding: 1rem 1rem;
     font-size: 0.8rem;
-    margin-right: -8rem;          /* выступ вправо */
-    padding-right: 12rem;          /* чтобы текст был в видимой части */
-    width: 8rem;                 /* фиксированная ширина */
+    margin-right: -8rem;
+    padding-right: 12rem;
+    width: 8rem;
     max-width: 8rem;
-    border-radius: 10px 0 0 10px;
     text-align: left;
     justify-content: flex-start;
     white-space: nowrap;
 }
-
-/* Наведение – общий эффект */
 .anchor-tab:hover {
     background: #E8DCD4;
     transform: translateX(-0.6rem);
 }
 
-/* Наведение – общий эффект */
-.anchor-tab:hover {
-    background: #E8DCD4;
-    transform: translateX(-0.6rem);
-}
-/* ===== СЕКЦИИ ===== */
-.section {
-    display: none;
-}
-.section--active {
-    display: block;
-}
-.section__title {
-    font-size: 2rem;
-    font-weight: 300;
-    margin-bottom: 1.5rem;
-    color: #2C3E50;
-}
 /* ===== СЕКЦИИ ===== */
 .section {
     display: none;
@@ -295,7 +283,7 @@ body {
     color: #2C3E50;
 }
 
-/* ===== КАРТОЧКИ (общие) ===== */
+/* ===== КАРТОЧКИ ===== */
 .card {
     background: #FFFFFF;
     border-radius: 14px;
@@ -345,7 +333,7 @@ body {
     font-size: 0.85rem;
 }
 
-/* ===== ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ ===== */
+/* ===== ВСПОМОГАТЕЛЬНО ===== */
 #salaryRange {
     display: none;
     gap: 0.5rem;
@@ -356,84 +344,14 @@ body {
     display: flex;
 }
 
-/* ===== АДАПТИВ ===== */
-@media (max-width: 992px) {
-    .page {
-        grid-template-columns: 1fr;
-        padding: 0 1rem;
-    }
-    .page__left,
-    .page__right {
-        display: none !important;
-    }
-    .page__main {
-        padding: 0;
-    }
-    .header__inner {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-    }
-    .header__logo {
-        margin-right: 0;
-        flex-basis: 100%;
-        text-align: center;
-    }
-    .header__nav {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    .footer__inner {
-        flex-direction: column;
-        align-items: center;
-    }
-}
-
-@media (max-width: 600px) {
-    .header__tab {
-        font-size: 0.85rem;
-        padding: 0.3rem 0.8rem;
-    }
-    .section__title {
-        font-size: 1.5rem;
-    }
-    .card {
-        padding: 1rem;
-    }
-    .header__inner {
-        padding: 0 0.8rem;
-    }
-    .page {
-        padding: 0 0.8rem;
-    }
-}
-
-@media (max-width: 992px) {
-    .page {
-        grid-template-columns: 1fr;
-        padding: 0 1rem;
-    }
-    .page__left,
-    .page__right {
-        display: none !important;
-        width: 0 !important;
-        min-width: 0 !important;
-        padding: 0 !important;
-    }
-    .page__main {
-        padding: 0;
-    }
-    /* ... остальное ... */
-}
 /* ===== КОНТЕКСТНОЕ ВЫПАДАЮЩЕЕ МЕНЮ ===== */
 .context-tabs {
-    position: relative; /* для позиционирования меню */
+    position: relative;
 }
-
 .context-dropdown {
     position: absolute;
     top: 0;
-    left: calc(100% + 8px); /* справа от кнопки */
+    left: calc(100% + 8px);
     background: #FFFFFF;
     border: 1px solid #E8E3DE;
     border-radius: 8px;
@@ -448,8 +366,6 @@ body {
 .context-dropdown.active {
     display: block;
 }
-
-/* Элементы списка (группы/профессии) */
 .context-dropdown .context-item {
     padding: 0.6rem 1rem;
     cursor: pointer;
@@ -465,8 +381,6 @@ body {
 .context-dropdown .context-item:not(:last-child) {
     border-bottom: 1px solid #F2EDE8;
 }
-
-/* Поле ввода для профессии */
 .context-dropdown .context-input-wrapper {
     padding: 0.4rem 0.8rem;
     border-bottom: 1px solid #F2EDE8;
@@ -484,11 +398,408 @@ body {
     box-shadow: 0 0 0 2px rgba(70, 130, 180, 0.15);
     outline: none;
 }
-
-/* Подсказка в меню */
 .context-dropdown .context-hint {
     padding: 0.6rem 1rem;
     color: #7F8C8D;
     font-size: 0.85rem;
     text-align: center;
+}
+
+/* ===== ОВЕРЛЕЙ ===== */
+.dropdown-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+.dropdown-overlay.active {
+    display: block;
+}
+
+/* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+}
+.mobile-menu.active {
+    display: block;
+}
+.mobile-menu__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.4);
+}
+.mobile-menu__panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 85%;
+    max-width: 400px;
+    height: 100%;
+    background: #FFFFFF;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    padding: 1.5rem 1rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+.mobile-menu.active .mobile-menu__panel {
+    transform: translateX(0);
+}
+.mobile-menu__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+.mobile-menu__title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2C3E50;
+}
+.mobile-menu__close {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #7F8C8D;
+}
+.mobile-menu__sections {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #EDE9E4;
+    padding-bottom: 1rem;
+}
+.mobile-menu__section {
+    background: transparent;
+    border: none;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #7F8C8D;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+}
+.mobile-menu__section:hover {
+    background: #F2EDE8;
+}
+.mobile-menu__section.active {
+    background: #E8DCD4;
+    color: #2C3E50;
+}
+.mobile-menu__anchors {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+.mobile-menu__anchor {
+    background: transparent;
+    border: none;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #7F8C8D;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.mobile-menu__anchor:hover {
+    background: #F2EDE8;
+}
+.mobile-menu__anchor.active {
+    color: #4682B4;
+    font-weight: 500;
+}
+
+/* ============================================================ */
+/* ========== МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 992px) ========== */
+/* ============================================================ */
+@media (max-width: 992px) {
+    /* ---------- Блокируем горизонтальный скролл ---------- */
+    html, body, .page, .page__main, .card, .filters, .vacancy-list,
+    .chart-container, .chart-container-sm, .graph-container,
+    #skills-matrix-container, #profession-graph {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+    }
+    body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+    }
+    .page * {
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ---------- Сетка ---------- */
+    .page {
+        grid-template-columns: 1fr !important;
+        padding: 0 0.5rem !important;
+        margin: 0.5rem auto !important;
+        width: 100% !important;
+        padding-bottom: 70px !important;
+    }
+    .page__main {
+        padding: 0 !important;
+    }
+
+    /* ---------- Скрываем боковые панели ---------- */
+    .page__left,
+    .page__right {
+        display: none !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* ---------- Хедер фиксирован внизу ---------- */
+    .header {
+        position: fixed !important;
+        bottom: 0 !important;
+        top: auto !important;
+        padding: 0.4rem 0 !important;
+        border-top: 1px solid #E8E3DE !important;
+        border-bottom: none !important;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.04) !important;
+        width: 100% !important;
+        z-index: 1000 !important;
+    }
+    .header--hidden {
+        transform: none !important;
+    }
+    .header__logo {
+        display: none !important;
+    }
+    .header__nav {
+        display: none !important;
+    }
+    .header__burger {
+        display: flex !important;
+        margin-left: auto !important;
+    }
+
+    /* Контекстные табы в хедере */
+    .header__context {
+        display: flex !important;
+        gap: 0.3rem !important;
+        align-items: center !important;
+        flex: 1 !important;
+        justify-content: center !important;
+        margin: 0 0.5rem !important;
+    }
+    .header__context .context-tab {
+        writing-mode: horizontal-tb !important;
+        padding: 1rem 0.8rem !important;
+        font-size: 0.9rem !important;
+        border-radius: 20px !important;
+        background: #F2EDE8 !important;
+        color: #7F8C8D !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: 0.2s !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        flex-shrink: 0 !important;
+    }
+    .header__context .context-tab.context-tab--active {
+        background: #FFED75 !important;
+        color: #2C3E50 !important;
+    }
+    .header__context .context-tab:hover {
+        transform: none !important;
+    }
+
+    /* Мобильный dropdown – поверх всего */
+    .header__context .context-dropdown {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: 90% !important;
+        max-width: 400px !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        background: #FFFFFF !important;
+        border: 1px solid #E8E3DE !important;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2) !important;
+        z-index: 2000 !important;
+        display: none !important;
+        padding: 8px 0 !important;
+    }
+    .header__context .context-dropdown.active {
+        display: block !important;
+    }
+
+    /* ---------- Фильтры агрегатора – вертикально ---------- */
+    .filters {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+    }
+    /* Все поля ввода, селекты, обёртки – на всю ширину */
+    .filters input,
+    .filters select,
+    .filters .skills-wrapper,
+    .filters .profession-wrapper,
+    .filters .experience-wrapper,
+    .filters .sort-wrapper,
+    .filters .company-wrapper,
+    .filters button {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: 2.6rem !important;
+        flex: 0 0 auto !important;
+    }
+    /* Лейблы с чекбоксами – компактно, не на всю ширину */
+    .filters label {
+        width: auto !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.4rem !important;
+        white-space: nowrap !important;
+        padding: 0 0.8rem !important;
+        height: 2.6rem !important;
+        border: 1px solid #E8E3DE !important;
+        border-radius: 8px !important;
+        background: #FFFFFF !important;
+        font-size: 0.95rem !important;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+    }
+    /* Обёртка для чекбоксов (если несколько label идут подряд) – можно оставить как есть */
+    .filters label input[type="checkbox"] {
+        width: 1rem !important;
+        height: 1rem !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
+        accent-color: #4682B4 !important;
+    }
+    /* Специальный стиль для чекбокса "Стажировка" */
+    .filters label:has(input#filterInternship) {
+        border-color: #ffadcf !important;
+        background: #fff5f8 !important;
+    }
+    .filters label:has(input#filterInternship):has(input:checked) {
+        background: #ffadcf !important;
+        border-color: #e68aaf !important;
+        color: #2C3E50 !important;
+    }
+    /* Чекбокс "Только с зарплатой" */
+    .filters label:has(input#filterHasSalary):has(input:checked) {
+        background: #F2EDE8 !important;
+        border-color: #D0CBC6 !important;
+    }
+
+    /* Обёртка зарплаты */
+    #salaryRange {
+        flex-direction: column !important;
+        gap: 0.3rem !important;
+    }
+    #salaryRange input {
+        width: 100% !important;
+    }
+
+    /* ---------- Матрица навыков ---------- */
+    .matrix-controls {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.8rem !important;
+        padding: 1rem !important;
+    }
+    .matrix-control-group {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .matrix-control-group select,
+    .matrix-control-group input {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .matrix-btn {
+        width: 100% !important;
+        margin-top: 0 !important;
+    }
+    #skills-matrix-container {
+        height: 400px !important;
+    }
+
+    /* ---------- Граф ---------- */
+    .graph-controls {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+    }
+    .graph-controls label {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+    .graph-controls input[type="range"] {
+        flex: 1 !important;
+        max-width: 100% !important;
+    }
+    #profession-graph {
+        height: 400px !important;
+    }
+
+    /* ---------- Карточки вакансий ---------- */
+    .vacancy-card .company-name,
+    .vacancy-card .meta .highlight,
+    .vacancy-card .skills span,
+    .vacancy-card .desc,
+    .vacancy-card h4 {
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+    }
+    .vacancy-card .meta {
+        flex-wrap: wrap !important;
+        gap: 0.3rem !important;
+    }
+
+    /* ---------- Графики ---------- */
+    .chart-container,
+    .chart-container-sm {
+        height: 300px !important;
+        width: 100% !important;
+        overflow: hidden !important;
+    }
+    canvas {
+        max-width: 100% !important;
+        height: auto !important;
+        display: block !important;
+    }
+    .grid-2 {
+        grid-template-columns: 1fr !important;
+    }
+    .section__title {
+        font-size: 1.5rem !important;
+    }
+
+    /* ---------- Оверлей ---------- */
+    .dropdown-overlay {
+        z-index: 200 !important;
+    }
 }
