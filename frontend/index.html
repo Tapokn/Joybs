@@ -50,14 +50,14 @@
             <!-- ===== СЕКЦИЯ О ПРОЕКТЕ ===== -->
             <section class="section section--active" id="section-about">
                 <h2 class="section__title">О проекте</h2>
-                <div class="card">
+                <div class="card"  id="about-text">
                     <p><strong>Joybs</strong> – платформа для студентов и начинающих IT-специалистов. Мы помогаем анализировать рынок, находить востребованные навыки и строить карьерный путь на основе данных.</p>
                     <p><strong>Стек:</strong> Python + FastAPI, SQLite, Chart.js, D3.js.</p>
                     <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам, частота навыков, влияние навыков на зарплату, коэффициент Жаккара для сходства профессий.</p>
                     <p><em>«Найди свой путь в IT через данные»</em></p>
                 </div>
 
-                <div class="card card--graph">
+                <div class="card card--graph" id="about-graph">
                     <h3>Граф сходства профессий</h3>
                     <div class="graph-wrapper">
                         <div id="profession-graph" class="graph-container"></div>
@@ -85,49 +85,49 @@
             <section class="section" id="section-analytics">
                 <h2 class="section__title">Аналитика и навыки</h2>
 
-                <div class="card" id="overview-stats">
+                <div class="card" id="stats-overview">
                     <h3>Общая статистика</h3>
                     <div id="statsPlaceholder">Загрузка...</div>
                 </div>
 
                 <div class="grid-2">
-                    <div class="card">
+                    <div class="card" id="distribution-pie">
                         <h3>Распределение вакансий</h3>
                         <div class="chart-container"><canvas id="pieChart"></canvas></div>
                     </div>
-                    <div class="card">
+                    <div class="card" id="median-bar">
                         <h3>Медианная зарплата по группам</h3>
                         <div class="chart-container"><canvas id="medianBarChart"></canvas></div>
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="histogram">
                     <h3>Гистограмма зарплат</h3>
                     <div class="chart-container"><canvas id="histogramChart"></canvas></div>
                 </div>
 
                 <div class="grid-2">
-                    <div class="card">
+                    <div class="card" id="work-format">
                         <h3>Распределение по формату работы</h3>
                         <div class="chart-container-sm"><canvas id="workFormatChart"></canvas></div>
                     </div>
-                    <div class="card">
+                    <div class="card" id="experience">
                         <h3>Распределение по опыту</h3>
                         <div class="chart-container-sm"><canvas id="experienceChart"></canvas></div>
                     </div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="top-skills">
                     <h3>Топ-10 навыков</h3>
                     <div class="chart-container"><canvas id="topSkillsChart"></canvas></div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="salary-impact">
                     <h3>Влияние навыков на зарплату</h3>
                     <div class="chart-container"><canvas id="salaryImpactChart"></canvas></div>
                 </div>
 
-                <div class="card">
+                <div class="card" id="skills-matrix">
                     <h3>Матрица совместной встречаемости навыков</h3>
                     <div class="matrix-controls">
                         <label>Топ навыков:
@@ -193,13 +193,7 @@
         <!-- Правая панель – якоря -->
         <aside class="page__right" id="rightPanel">
             <nav class="anchor-tabs">
-                <a href="#section-analytics" class="anchor-tab">Обзор</a>
-                <a href="#section-analytics" data-scroll="pie" class="anchor-tab">Распределение</a>
-                <a href="#section-analytics" data-scroll="median" class="anchor-tab">Зарплата по группам</a>
-                <a href="#section-analytics" data-scroll="hist" class="anchor-tab">Гистограмма</a>
-                <a href="#section-analytics" data-scroll="topskills" class="anchor-tab">Топ-навыки</a>
-                <a href="#section-analytics" data-scroll="impact" class="anchor-tab">Влияние навыков</a>
-                <a href="#section-analytics" data-scroll="matrix" class="anchor-tab">Матрица</a>
+                
             </nav>
         </aside>
 

@@ -51,6 +51,7 @@ document.querySelectorAll('.header__tab').forEach(btn => {
         if (tab === 'about' || tab === 'analytics') {
             document.getElementById('leftPanel').style.display = '';
             document.getElementById('rightPanel').style.display = '';
+            renderAnchors(tab); 
         } else {
             document.getElementById('leftPanel').style.display = 'none';
             document.getElementById('rightPanel').style.display = 'none';
@@ -72,6 +73,7 @@ document.querySelectorAll('.header__tab').forEach(btn => {
 });
 
 document.querySelector('.header__tab[data-tab="about"]').click();
+renderAnchors('about');
 
 // ========== КОНТЕКСТ (левая панель) ==========
 
@@ -320,3 +322,59 @@ window.addEventListener('scroll', () => {
     }
     lastScrollY = currentScrollY;
 });
+// ========== ПРАВАЯ ПАНЕЛЬ – ЯКОРЯ ==========
+function getAnchorsForTab(tab) {
+    const anchors = {
+        'about': [
+            { label: 'О проекте', target: '#about-text' },
+            { label: 'Граф', target: '#about-graph' }
+        ],
+        'analytics': [
+            { label: 'Обзор', target: '#stats-overview' },
+            { label: 'Распределение', target: '#distribution-pie' },
+            { label: 'Зарплата по группам', target: '#median-bar' },
+            { label: 'Гистограмма', target: '#histogram' },
+            { label: 'Форматы', target: '#work-format' },
+            { label: 'Опыт', target: '#experience' },
+            { label: 'Топ навыки', target: '#top-skills' },
+            { label: 'Влияние навыков', target: '#salary-impact' },
+            { label: 'Матрица', target: '#skills-matrix' }
+        ],
+        'aggregator': [
+            { label: 'Агрегатор', target: '#section-aggregator' }
+        ]
+    };
+    return anchors[tab] || [];
+}
+
+function renderAnchors(tab) {
+    const container = document.querySelector('.anchor-tabs');
+    if (!container) return;
+    const anchors = getAnchorsForTab(tab);
+    container.innerHTML = '';
+    
+    anchors.forEach(a => {
+        const link = document.createElement('a');
+        link.href = a.target;
+        link.className = 'anchor-tab';
+        link.textContent = a.label;
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(a.target);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+        container.appendChild(link);
+    });
+
+    // Добавляем класс в зависимости от количества якорей
+    const count = anchors.length;
+    container.classList.remove('few', 'many');
+    if (count <= 4) {
+        container.classList.add('few');
+    } else {
+        container.classList.add('many');
+    }
+
+}

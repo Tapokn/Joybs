@@ -13,6 +13,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    overflow-x: hidden;   /* ← запрещаем горизонтальную прокрутку */
+
 }
 
 /* ===== ХЭДЕР ===== */
@@ -144,18 +146,6 @@ body {
     color: #2C3E50;
 }
 
-/* Правая панель – якоря */
-.page__right {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 1rem;
-    overflow: visible;
-    position: relative;
-    width: auto;
-    min-width: 0rem;           /* ← добавили */
-
-}
 
 /* Основной контент */
 .page__main {
@@ -197,37 +187,100 @@ body {
 }
 
 /* ===== ПРАВАЯ ПАНЕЛЬ (якоря) ===== */
+.page__right {
+    position: sticky;
+    top: 3rem;
+    align-self: flex-start;
+    height: calc(100vh - 4rem);
+    overflow: visible;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: transparent;
+}
+
 .anchor-tabs {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-start;
+    justify-content: space-around;
+    height: 90%;
+    position: relative;
+    pointer-events: auto;
 }
 
+/* Базовый стиль для всех табов */
 .anchor-tab {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    padding: 0.8rem 0.25rem;
-    border-radius: 0 8px 8px 0;
+    border: none;
+    border-radius: 10px 0 0 10px;
     background: #F2EDE8;
     color: #7F8C8D;
-    text-decoration: none;
-    font-size: 1rem;
     font-weight: 500;
+    cursor: pointer;
     transition: transform 0.2s, background 0.2s;
-    text-align: center;
-    letter-spacing: 0.5px;
-    width: 2rem;
-    min-width: 2rem;
-    max-width: 2rem;
     box-sizing: border-box;
+    flex-shrink: 0;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.05);
+    text-decoration: none;
+    color: #7F8C8D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1.2;
-}
-.anchor-tab:hover {
-    background: #E8DCD4;
-    transform: translateX(-0.4rem) rotate(180deg);
+    text-align: center;
 }
 
+/* Режим "мало" (о проекте) – широкие, вертикальный текст, как левые табы */
+.anchor-tabs.few .anchor-tab {
+    writing-mode: vertical-RL;
+    padding: 3.2rem 1rem;
+    font-size: 1.16rem;
+    margin-right: -10rem;
+    padding-right: 8rem;
+    min-width: 3rem;
+    max-width: 4rem;
+    border-radius: 10px 0 0 10px;
+}
+
+/* Режим "много" (аналитика) – узкие, горизонтальный текст, компактно */
+.anchor-tabs.many .anchor-tab {
+    writing-mode: horizontal-tb;
+    padding: 1rem 1rem;
+    font-size: 0.8rem;
+    margin-right: -8rem;          /* выступ вправо */
+    padding-right: 12rem;          /* чтобы текст был в видимой части */
+    width: 8rem;                 /* фиксированная ширина */
+    max-width: 8rem;
+    border-radius: 10px 0 0 10px;
+    text-align: left;
+    justify-content: flex-start;
+    white-space: nowrap;
+}
+
+/* Наведение – общий эффект */
+.anchor-tab:hover {
+    background: #E8DCD4;
+    transform: translateX(-0.6rem);
+}
+
+/* Наведение – общий эффект */
+.anchor-tab:hover {
+    background: #E8DCD4;
+    transform: translateX(-0.6rem);
+}
+/* ===== СЕКЦИИ ===== */
+.section {
+    display: none;
+}
+.section--active {
+    display: block;
+}
+.section__title {
+    font-size: 2rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    color: #2C3E50;
+}
 /* ===== СЕКЦИИ ===== */
 .section {
     display: none;
