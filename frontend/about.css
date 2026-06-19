@@ -60,6 +60,8 @@
     border-radius: 8px;
     min-height: 2rem;
     font-size: 0.95rem;
+    max-height: 200px;
+    overflow-y: auto;
 }
 #updateGraphBtn {
     background: #4682B4;
@@ -100,14 +102,32 @@
 .graph-zoom-controls button:hover {
     background: #E8DCD4;
 }
-/* курсор на рёбрах – обычная стрелка */
-.graph-group line {
-    cursor: default;
-}
 
-/* Курсор и свечение для связей */
+/* курсор на рёбрах – pointer */
 .graph-group line {
     cursor: pointer;
     transition: stroke 0.2s, stroke-width 0.2s, filter 0.2s;
 }
-/* Узлы – курсор pointer уже задан в JS */
+
+/* ===== ВСПЛЫВАЮЩАЯ ПОДСКАЗКА (полупрозрачная) ===== */
+#graph-hover-tooltip {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    font-size: 0.9rem;
+    max-width: 300px;
+    z-index: 10000;
+    border: 1px solid rgba(200,200,200,0.3);
+    background: rgba(255, 255, 255, 0.7) !important; /* 70% прозрачности */
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+}
+#graph-hover-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}

@@ -1,8 +1,8 @@
 // ========== ГРАФ ПРОФЕССИЙ ==========
-let selectedNodeId = null;          // ID узла, выделенного кликом (числовой)
-let selectedProfLabel = null;      // Название профессии, выбранной через контекст
-let previousProfession = null;     // для отслеживания смены профессии
-let manualThreshold = false;       // флаг, что пользователь вручную менял ползунок
+let selectedNodeId = null;
+let selectedProfLabel = null;
+let previousProfession = null;
+let manualThreshold = false;
 let zoomBehavior = null;
 let svgElement = null;
 let graphGroup = null;
@@ -18,22 +18,19 @@ async function loadProfessionGraph() {
         group = contextValue;
         selectedProfLabel = null;
         previousProfession = null;
-        manualThreshold = false;   // при выборе группы сбрасываем ручной режим
+        manualThreshold = false;
     } else if (contextType === 'profession' && contextValue) {
         profession = contextValue;
-        // Если профессия изменилась И ручной режим НЕ включён – подбираем порог
         if (profession !== previousProfession && !manualThreshold) {
             previousProfession = profession;
             const optimalThreshold = await findOptimalThreshold(profession);
             document.getElementById('jaccardThreshold').value = optimalThreshold;
             document.getElementById('jaccardValue').textContent = optimalThreshold.toFixed(2);
         } else {
-            // если профессия та же или ручной режим – просто обновляем previousProfession
             previousProfession = profession;
         }
         selectedProfLabel = profession;
     } else {
-        // contextType === 'all'
         selectedProfLabel = null;
         previousProfession = null;
         manualThreshold = false;
@@ -64,7 +61,6 @@ async function loadProfessionGraph() {
     }
 }
 
-// Автоподбор порога, чтобы узлов было 2..15
 async function findOptimalThreshold(profession) {
     let threshold = 0.1;
     const maxAttempts = 20;
@@ -159,7 +155,86 @@ function renderD3Graph(data) {
         .attr('dy', 4)
         .style('pointer-events', 'none');
 
-    // ---- Функции подсветки ----
+    // ---- Всплывающий тултип ----
+    let hoverTooltip = document.getElementById('graph-hover-tooltip');
+    if (!hoverTooltip) {
+        hoverTooltip = document.createElement('div');
+        hoverTooltip.id = 'graph-hover-tooltip';
+        container.style.position = 'relative';
+        container.appendChild(hoverTooltip);
+    }
+
+    // Кеши (храним полные списки)
+    const nodeSkillsCache = {};
+    const edgeSkillsCache = {};
+
+    // ---- Функция позиционирования ----
+    function updateTooltipPosition(clientX, clientY) {
+        const rect = container.getBoundingClientRect();
+        const tooltip = hoverTooltip;
+        const tw = tooltip.offsetWidth;
+        const th = tooltip.offsetHeight;
+        if (tw === 0 || th === 0) return;
+
+        const containerWidth = rect.width;
+        const containerHeight = rect.height;
+
+        let desiredLeft = clientX - rect.left + 15;
+        let desiredTop = clientY - rect.top + 15;
+
+        const maxLeftShift = tw / 2;
+        const maxTopShift = th / 2;
+
+        let left = desiredLeft;
+        let top = desiredTop;
+
+        if (left + tw > containerWidth) {
+            let leftCandidate = clientX - rect.left - tw - 15;
+            const cursorLeft = clientX - rect.left;
+            const minLeft = cursorLeft - maxLeftShift;
+            if (leftCandidate < minLeft) leftCandidate = minLeft;
+            if (leftCandidate < 0) leftCandidate = 0;
+            left = leftCandidate;
+        }
+        if (left < 0) left = 0;
+
+        if (top + th > containerHeight) {
+            let topCandidate = clientY - rect.top - th - 15;
+            const cursorTop = clientY - rect.top;
+            const minTop = cursorTop - maxTopShift;
+            if (topCandidate < minTop) topCandidate = minTop;
+            if (topCandidate < 0) topCandidate = 0;
+            top = topCandidate;
+        }
+        if (top < 0) top = 0;
+
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    }
+
+    function showHoverTooltip(content, clientX, clientY) {
+        const tooltip = hoverTooltip;
+        tooltip.innerHTML = content;
+        tooltip.style.display = 'block';
+        tooltip.classList.remove('visible');
+        tooltip.style.visibility = 'visible';
+        updateTooltipPosition(clientX, clientY);
+        requestAnimationFrame(() => {
+            tooltip.classList.add('visible');
+        });
+    }
+
+    function hideHoverTooltip() {
+        const tooltip = hoverTooltip;
+        tooltip.classList.remove('visible');
+        setTimeout(() => {
+            if (!tooltip.classList.contains('visible')) {
+                tooltip.style.display = 'none';
+            }
+        }, 350);
+    }
+
+    // ---- Подсветка ----
     function highlightNode(d) {
         node.filter(n => n.id === d.id)
             .attr('fill', '#FFD700')
@@ -189,7 +264,7 @@ function renderD3Graph(data) {
             .style('filter', 'none');
     }
 
-    // ---- Подсветка из контекста ----
+    // Подсветка выбранной
     if (selectedProf) {
         const targetNode = nodes.find(n => n.label === selectedProf);
         if (targetNode) {
@@ -201,65 +276,70 @@ function renderD3Graph(data) {
         }
     }
 
-    // ---- Всплывающий тултип (внутри контейнера) ----
-    let hoverTooltip = document.getElementById('graph-hover-tooltip');
-    if (!hoverTooltip) {
-        hoverTooltip = document.createElement('div');
-        hoverTooltip.id = 'graph-hover-tooltip';
-        hoverTooltip.style.cssText = 'display:none; position:absolute; pointer-events:none; background:rgba(255,255,255,0.95); border-radius:8px; padding:8px 14px; box-shadow:0 4px 16px rgba(0,0,0,0.15); font-size:0.9rem; max-width:300px; z-index:10000; backdrop-filter:blur(2px); border:1px solid rgba(200,200,200,0.3);';
-        container.style.position = 'relative';
-        container.appendChild(hoverTooltip);
-    }
-    const nodeSkillsCache = {};
-    const edgeSkillsCache = {};
-
-    function showHoverTooltip(content, clientX, clientY) {
-        const rect = container.getBoundingClientRect();
-        const offsetX = clientX - rect.left;
-        const offsetY = clientY - rect.top;
-        hoverTooltip.innerHTML = content;
-        hoverTooltip.style.display = 'block';
-        hoverTooltip.style.left = (offsetX + 15) + 'px';
-        hoverTooltip.style.top = (offsetY + 15) + 'px';
+    // ---- Статический тултип (под графом) – ВСЕ навыки ----
+    function showStaticTooltip(d) {
+        fetch(`/api/graph/profession/${encodeURIComponent(d.label)}/skills?limit=1000`)
+            .then(resp => resp.json())
+            .then(data => {
+                const tooltip = document.getElementById('graph-tooltip');
+                const skills = data.map(s => s.skill + ' (' + s.count + ')').join(', ');
+                tooltip.innerHTML = `<strong>${d.label}</strong> (${d.count} вакансий, ${d.degree} связей)<br>Все навыки: ${skills || 'нет'}`;
+            })
+            .catch(() => {
+                document.getElementById('graph-tooltip').innerHTML = `<strong>${d.label}</strong> (ошибка загрузки навыков)`;
+            });
     }
 
-    function hideHoverTooltip() {
-        hoverTooltip.style.display = 'none';
-        hoverTooltip.dataset.nodeId = '';
-        hoverTooltip.dataset.edgeKey = '';
-    }
-
-    // ---- Наведение на узел ----
+    // ---- Обработчики узлов ----
     node.on('mouseover', function(event, d) {
         const label = d.label;
         let content = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}`;
+        
         if (!nodeSkillsCache[d.id]) {
-            fetch(`/api/graph/profession/${encodeURIComponent(label)}/skills?limit=5`)
+            // Первый раз – грузим все навыки, но показываем первые 10
+            content += '<br>Загрузка навыков…';
+            showHoverTooltip(content, event.clientX, event.clientY);
+            hoverTooltip.dataset.nodeId = d.id;
+
+            fetch(`/api/graph/profession/${encodeURIComponent(label)}/skills?limit=1000`)
                 .then(resp => resp.json())
                 .then(skillsData => {
-                    nodeSkillsCache[d.id] = skillsData.map(s => s.skill).join(', ');
-                    if (hoverTooltip.style.display === 'block' && hoverTooltip.dataset.nodeId == d.id) {
-                        const updatedContent = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}<br>Топ навыки: ${nodeSkillsCache[d.id]}`;
-                        hoverTooltip.innerHTML = updatedContent;
+                    const allSkills = skillsData.map(s => s.skill);
+                    nodeSkillsCache[d.id] = allSkills;
+                    // Если тултип всё ещё виден и это тот же узел – обновляем
+                    if (hoverTooltip.classList.contains('visible') && hoverTooltip.dataset.nodeId == d.id) {
+                        const display = allSkills.slice(0, 10);
+                        let skillsStr = display.join(', ');
+                        if (allSkills.length > 10) skillsStr += ' …';
+                        hoverTooltip.innerHTML = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}<br>Навыки: ${skillsStr}`;
+                        updateTooltipPosition(event.clientX, event.clientY);
                     }
                 })
-                .catch(() => {});
+                .catch(() => {
+                    nodeSkillsCache[d.id] = [];
+                    if (hoverTooltip.classList.contains('visible') && hoverTooltip.dataset.nodeId == d.id) {
+                        hoverTooltip.innerHTML = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}<br>Навыки: ошибка загрузки`;
+                        updateTooltipPosition(event.clientX, event.clientY);
+                    }
+                });
+        } else {
+            // Уже загружено
+            const allSkills = nodeSkillsCache[d.id];
+            const display = allSkills.slice(0, 10);
+            let skillsStr = display.join(', ');
+            if (allSkills.length > 10) skillsStr += ' …';
+            content += `<br>Навыки: ${skillsStr}`;
+            showHoverTooltip(content, event.clientX, event.clientY);
+            hoverTooltip.dataset.nodeId = d.id;
         }
-        const skills = nodeSkillsCache[d.id] ? `<br>Топ навыки: ${nodeSkillsCache[d.id]}` : '<br>Загрузка навыков...';
-        content += skills;
-        showHoverTooltip(content, event.clientX, event.clientY);
-        hoverTooltip.dataset.nodeId = d.id;
+
         if (selectedNodeId !== d.id) {
             d3.select(this).attr('stroke', '#FFA500').attr('stroke-width', 2);
         }
     })
     .on('mousemove', function(event, d) {
-        if (hoverTooltip.style.display === 'block') {
-            const rect = container.getBoundingClientRect();
-            const offsetX = event.clientX - rect.left;
-            const offsetY = event.clientY - rect.top;
-            hoverTooltip.style.left = (offsetX + 15) + 'px';
-            hoverTooltip.style.top = (offsetY + 15) + 'px';
+        if (hoverTooltip.classList.contains('visible')) {
+            updateTooltipPosition(event.clientX, event.clientY);
         }
     })
     .on('mouseout', function(event, d) {
@@ -269,34 +349,49 @@ function renderD3Graph(data) {
         }
     });
 
-    // ---- Наведение на ребро ----
+    // ---- Обработчики рёбер ----
     link.on('mouseover', function(event, d) {
         const source = d.source.label || d.source.id;
         const target = d.target.label || d.target.id;
         const cacheKey = source + '|' + target;
-        let content = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: загрузка...`;
-        showHoverTooltip(content, event.clientX, event.clientY);
-        hoverTooltip.dataset.edgeKey = cacheKey;
 
+        let content = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: `;
         if (edgeSkillsCache[cacheKey]) {
-            const common = edgeSkillsCache[cacheKey].join(', ') || 'нет общих навыков';
-            if (hoverTooltip.style.display === 'block' && hoverTooltip.dataset.edgeKey == cacheKey) {
-                hoverTooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${common}`;
-            }
+            const allSkills = edgeSkillsCache[cacheKey];
+            const display = allSkills.slice(0, 10);
+            let skillsStr = display.join(', ');
+            if (allSkills.length > 10) skillsStr += ' …';
+            content += skillsStr || 'нет общих';
+            showHoverTooltip(content, event.clientX, event.clientY);
+            hoverTooltip.dataset.edgeKey = cacheKey;
         } else {
+            content += 'загрузка…';
+            showHoverTooltip(content, event.clientX, event.clientY);
+            hoverTooltip.dataset.edgeKey = cacheKey;
+
             fetch(`/api/graph/edge/skills?prof_a=${encodeURIComponent(source)}&prof_b=${encodeURIComponent(target)}`)
                 .then(resp => resp.json())
                 .then(data => {
-                    edgeSkillsCache[cacheKey] = data.common_skills || [];
-                    const common = edgeSkillsCache[cacheKey].join(', ') || 'нет общих навыков';
-                    if (hoverTooltip.style.display === 'block' && hoverTooltip.dataset.edgeKey == cacheKey) {
-                        hoverTooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${common}`;
+                    const allSkills = data.common_skills || [];
+                    edgeSkillsCache[cacheKey] = allSkills;
+                    // Если тултип всё ещё виден и это то же ребро – обновляем
+                    if (hoverTooltip.classList.contains('visible') && hoverTooltip.dataset.edgeKey == cacheKey) {
+                        const display = allSkills.slice(0, 10);
+                        let skillsStr = display.join(', ');
+                        if (allSkills.length > 10) skillsStr += ' …';
+                        hoverTooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${skillsStr || 'нет общих'}`;
+                        updateTooltipPosition(event.clientX, event.clientY);
                     }
                 })
-                .catch(() => {});
+                .catch(() => {
+                    edgeSkillsCache[cacheKey] = [];
+                    if (hoverTooltip.classList.contains('visible') && hoverTooltip.dataset.edgeKey == cacheKey) {
+                        hoverTooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ошибка загрузки`;
+                        updateTooltipPosition(event.clientX, event.clientY);
+                    }
+                });
         }
 
-        // Подсветка ребра
         d3.select(this)
             .attr('stroke', '#FFC107')
             .attr('stroke-opacity', 1)
@@ -307,12 +402,8 @@ function renderD3Graph(data) {
             .attr('stroke-width', 2);
     })
     .on('mousemove', function(event, d) {
-        if (hoverTooltip.style.display === 'block') {
-            const rect = container.getBoundingClientRect();
-            const offsetX = event.clientX - rect.left;
-            const offsetY = event.clientY - rect.top;
-            hoverTooltip.style.left = (offsetX + 15) + 'px';
-            hoverTooltip.style.top = (offsetY + 15) + 'px';
+        if (hoverTooltip.classList.contains('visible')) {
+            updateTooltipPosition(event.clientX, event.clientY);
         }
     })
     .on('mouseout', function(event, d) {
@@ -335,16 +426,6 @@ function renderD3Graph(data) {
             .attr('stroke', (n) => n.id === selectedNodeId ? '#FFA500' : '#2c3e50')
             .attr('stroke-width', (n) => n.id === selectedNodeId ? 3 : 1);
     });
-
-    // ---- Статический тултип для клика ----
-    function showStaticTooltip(d) {
-        fetch(`/api/graph/profession/${encodeURIComponent(d.label)}/skills?limit=10`)
-            .then(resp => resp.json())
-            .then(data => {
-                const tooltip = document.getElementById('graph-tooltip');
-                tooltip.innerHTML = `<strong>${d.label}</strong> (${d.count} вакансий, ${d.degree} связей)<br>Топ навыки: ${data.map(s => s.skill + ' (' + s.count + ')').join(', ')}`;
-            });
-    }
 
     // ---- Клик по узлу ----
     node.on('click', function(event, d) {
@@ -373,7 +454,11 @@ function renderD3Graph(data) {
             .then(resp => resp.json())
             .then(data => {
                 const tooltip = document.getElementById('graph-tooltip');
-                tooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${data.common_skills.join(', ') || 'нет'}`;
+                const allSkills = data.common_skills || [];
+                tooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Все общие навыки: ${allSkills.join(', ') || 'нет'}`;
+            })
+            .catch(() => {
+                document.getElementById('graph-tooltip').innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Ошибка загрузки общих навыков`;
             });
     });
 
@@ -395,7 +480,6 @@ function renderD3Graph(data) {
         }
     }
 
-    // ---- Симуляция ----
     simulation.on('tick', () => {
         link
             .attr('x1', d => d.source.x)
@@ -410,21 +494,17 @@ function renderD3Graph(data) {
             .attr('y', d => d.y);
     });
 
-    // ---- Зум к узлу ----
+    // ---- Зум ----
     function zoomToNode(d, w, h) {
         if (!d || !d.x || !d.y) return;
         const scale = 1.8;
         const tx = w / 2 - d.x * scale;
         const ty = h / 2 - d.y * scale;
         const transform = d3.zoomIdentity.translate(tx, ty).scale(scale);
-        svg.transition()
-            .duration(600)
-            .ease(d3.easeCubicInOut)
-            .call(zoomBehavior.transform, transform);
+        svg.transition().duration(600).ease(d3.easeCubicInOut).call(zoomBehavior.transform, transform);
         window._graphTransform = transform;
     }
 
-    // ---- Автоцентрирование ----
     function applyAutoZoom(nodes, w, h) {
         if (zoomApplied) return;
         let centerNode = null;
@@ -462,15 +542,11 @@ function renderD3Graph(data) {
         const ty = h / 2 - cy * scale;
 
         const transform = d3.zoomIdentity.translate(tx, ty).scale(scale);
-        svg.transition()
-            .duration(600)
-            .ease(d3.easeCubicInOut)
-            .call(zoomBehavior.transform, transform);
+        svg.transition().duration(600).ease(d3.easeCubicInOut).call(zoomBehavior.transform, transform);
         window._graphTransform = transform;
         zoomApplied = true;
     }
 
-    // ---- Зум-поведение ----
     zoomBehavior = d3.zoom()
         .scaleExtent([0.2, 5])
         .on('zoom', (event) => {
@@ -486,7 +562,7 @@ function renderD3Graph(data) {
         svg.call(zoomBehavior.transform, window._graphTransform);
     }
 
-    // ---- Кнопки зума ----
+    // Кнопки зума
     document.getElementById('zoomInBtn').onclick = () => {
         const current = d3.zoomTransform(svg.node());
         const newScale = Math.min(current.k * 1.3, 5);
@@ -504,15 +580,13 @@ function renderD3Graph(data) {
         applyAutoZoom(nodes, width, height);
     };
 
-    // ---- Полноэкранный режим ----
+    // Полноэкранный режим
     if (fullscreenHandler) {
         document.removeEventListener('fullscreenchange', fullscreenHandler);
         fullscreenHandler = null;
     }
     fullscreenHandler = function() {
-        setTimeout(() => {
-            loadProfessionGraph();
-        }, 100);
+        setTimeout(() => loadProfessionGraph(), 100);
         document.removeEventListener('fullscreenchange', fullscreenHandler);
         fullscreenHandler = null;
     };
@@ -527,7 +601,6 @@ function renderD3Graph(data) {
         }
     };
 
-    // ---- Автоцентрирование по завершении симуляции ----
     simulation.on('end', () => {
         if (!zoomApplied) {
             applyAutoZoom(nodes, width, height);
@@ -550,11 +623,11 @@ function updateGraphContextInfo() {
     info.textContent = text;
 }
 
-// ---- Ползунок (ручное изменение) ----
+// ---- Ползунок ----
 document.getElementById('jaccardThreshold').addEventListener('input', function() {
     const value = parseFloat(this.value).toFixed(2);
     document.getElementById('jaccardValue').textContent = value;
-    manualThreshold = true;   // включаем ручной режим – автоподбор больше не перезапишет
+    manualThreshold = true;
 });
 
 // ---- Кнопка обновления ----
