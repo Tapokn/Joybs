@@ -113,26 +113,23 @@ function renderD3Graph(data) {
 
     const selectedProf = selectedProfLabel;
 
-    // ---- УСКОРЕННАЯ СИМУЛЯЦИЯ (быстрее затухает) ----
     simulation = d3.forceSimulation(nodes)
         .force('link', d3.forceLink(edges).id(d => d.id).distance(120))
         .force('charge', d3.forceManyBody().strength(-300))
         .force('center', d3.forceCenter(width / 2, height / 2))
-        .alphaDecay(0.08)      // быстрое затухание → зум сработает раньше
-        .velocityDecay(0.6);   // повышенное трение
+        .alphaDecay(0.08)
+        .velocityDecay(0.6);
 
-    // ---- Рёбра (УВЕЛИЧЕННАЯ ТОЛЩИНА) ----
     const link = g.append('g')
         .selectAll('line')
         .data(edges)
         .enter().append('line')
         .attr('stroke', '#999')
         .attr('stroke-opacity', 0.6)
-        .attr('stroke-width', d => Math.sqrt(d.weight) * 5)   // было *3, теперь *5 – жирнее
+        .attr('stroke-width', d => Math.sqrt(d.weight) * 5)
         .style('cursor', 'pointer')
         .style('transition', 'stroke 0.2s, stroke-width 0.2s, filter 0.2s');
 
-    // ---- Узлы ----
     const node = g.append('g')
         .selectAll('circle')
         .data(nodes)
@@ -152,7 +149,6 @@ function renderD3Graph(data) {
             .on('drag', dragged)
             .on('end', dragended));
 
-    // ---- Подписи ----
     const label = g.append('g')
         .selectAll('text')
         .data(nodes)
@@ -163,7 +159,7 @@ function renderD3Graph(data) {
         .attr('dy', 4)
         .style('pointer-events', 'none');
 
-    // ---- Функции подсветки (связи – бледно-жёлтые) ----
+    // ---- Функции подсветки ----
     function highlightNode(d) {
         node.filter(n => n.id === d.id)
             .attr('fill', '#FFD700')
@@ -173,7 +169,7 @@ function renderD3Graph(data) {
         link.filter(l => l.source.id === d.id || l.target.id === d.id)
             .attr('stroke', '#FFE082')
             .attr('stroke-opacity', 1)
-            .attr('stroke-width', l => Math.sqrt(l.weight) * 6)   // жирнее при выделении
+            .attr('stroke-width', l => Math.sqrt(l.weight) * 6)
             .style('filter', 'drop-shadow(0 0 4px #FFE082)');
     }
 
@@ -189,7 +185,7 @@ function renderD3Graph(data) {
         .attr('r', d => 5 + Math.sqrt(d.degree) * 3);
         link.attr('stroke', '#999')
             .attr('stroke-opacity', 0.6)
-            .attr('stroke-width', d => Math.sqrt(d.weight) * 5)   // возвращаем увеличенную толщину
+            .attr('stroke-width', d => Math.sqrt(d.weight) * 5)
             .style('filter', 'none');
     }
 
@@ -201,53 +197,126 @@ function renderD3Graph(data) {
             targetNode.fy = height / 2;
             highlightNode(targetNode);
             selectedNodeId = targetNode.id;
-            showTooltip(targetNode);
+            showStaticTooltip(targetNode);
         }
     }
 
-    // ---- Клик по узлу ----
-    node.on('click', function(event, d) {
-        event.stopPropagation();
-        if (selectedNodeId === d.id) {
-            clearHighlight();
-            selectedNodeId = null;
-            zoomApplied = false;
-            applyAutoZoom(nodes, width, height);
-            return;
-        }
-        clearHighlight();
-        highlightNode(d);
-        selectedNodeId = d.id;
-        showTooltip(d);
-        zoomToNode(d, width, height);
-    });
+    // ---- Всплывающий тултип (внутри контейнера) ----
+    let hoverTooltip = document.getElementById('graph-hover-tooltip');
+    if (!hoverTooltip) {
+        hoverTooltip = document.createElement('div');
+        hoverTooltip.id = 'graph-hover-tooltip';
+        hoverTooltip.style.cssText = 'display:none; position:absolute; pointer-events:none; background:rgba(255,255,255,0.95); border-radius:8px; padding:8px 14px; box-shadow:0 4px 16px rgba(0,0,0,0.15); font-size:0.9rem; max-width:300px; z-index:10000; backdrop-filter:blur(2px); border:1px solid rgba(200,200,200,0.3);';
+        container.style.position = 'relative';
+        container.appendChild(hoverTooltip);
+    }
+    const nodeSkillsCache = {};
+    const edgeSkillsCache = {};
+
+    function showHoverTooltip(content, clientX, clientY) {
+        const rect = container.getBoundingClientRect();
+        const offsetX = clientX - rect.left;
+        const offsetY = clientY - rect.top;
+        hoverTooltip.innerHTML = content;
+        hoverTooltip.style.display = 'block';
+        hoverTooltip.style.left = (offsetX + 15) + 'px';
+        hoverTooltip.style.top = (offsetY + 15) + 'px';
+    }
+
+    function hideHoverTooltip() {
+        hoverTooltip.style.display = 'none';
+        hoverTooltip.dataset.nodeId = '';
+        hoverTooltip.dataset.edgeKey = '';
+    }
 
     // ---- Наведение на узел ----
     node.on('mouseover', function(event, d) {
-        if (selectedNodeId !== d.id) {
-            d3.select(this)
-                .attr('stroke', '#FFA500')
-                .attr('stroke-width', 2);
+        const label = d.label;
+        let content = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}`;
+        if (!nodeSkillsCache[d.id]) {
+            fetch(`/api/graph/profession/${encodeURIComponent(label)}/skills?limit=5`)
+                .then(resp => resp.json())
+                .then(skillsData => {
+                    nodeSkillsCache[d.id] = skillsData.map(s => s.skill).join(', ');
+                    if (hoverTooltip.style.display === 'block' && hoverTooltip.dataset.nodeId == d.id) {
+                        const updatedContent = `<strong>${label}</strong><br>Вакансий: ${d.count}<br>Связей: ${d.degree}<br>Топ навыки: ${nodeSkillsCache[d.id]}`;
+                        hoverTooltip.innerHTML = updatedContent;
+                    }
+                })
+                .catch(() => {});
         }
-    }).on('mouseout', function(event, d) {
+        const skills = nodeSkillsCache[d.id] ? `<br>Топ навыки: ${nodeSkillsCache[d.id]}` : '<br>Загрузка навыков...';
+        content += skills;
+        showHoverTooltip(content, event.clientX, event.clientY);
+        hoverTooltip.dataset.nodeId = d.id;
         if (selectedNodeId !== d.id) {
-            d3.select(this)
-                .attr('stroke', '#2c3e50')
-                .attr('stroke-width', 1);
+            d3.select(this).attr('stroke', '#FFA500').attr('stroke-width', 2);
+        }
+    })
+    .on('mousemove', function(event, d) {
+        if (hoverTooltip.style.display === 'block') {
+            const rect = container.getBoundingClientRect();
+            const offsetX = event.clientX - rect.left;
+            const offsetY = event.clientY - rect.top;
+            hoverTooltip.style.left = (offsetX + 15) + 'px';
+            hoverTooltip.style.top = (offsetY + 15) + 'px';
+        }
+    })
+    .on('mouseout', function(event, d) {
+        hideHoverTooltip();
+        if (selectedNodeId !== d.id) {
+            d3.select(this).attr('stroke', '#2c3e50').attr('stroke-width', 1);
         }
     });
 
-    // ---- Наведение на ребро (подсветка ярко-жёлтым) ----
+    // ---- Наведение на ребро ----
     link.on('mouseover', function(event, d) {
+        const source = d.source.label || d.source.id;
+        const target = d.target.label || d.target.id;
+        const cacheKey = source + '|' + target;
+        let content = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: загрузка...`;
+        showHoverTooltip(content, event.clientX, event.clientY);
+        hoverTooltip.dataset.edgeKey = cacheKey;
+
+        if (edgeSkillsCache[cacheKey]) {
+            const common = edgeSkillsCache[cacheKey].join(', ') || 'нет общих навыков';
+            if (hoverTooltip.style.display === 'block' && hoverTooltip.dataset.edgeKey == cacheKey) {
+                hoverTooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${common}`;
+            }
+        } else {
+            fetch(`/api/graph/edge/skills?prof_a=${encodeURIComponent(source)}&prof_b=${encodeURIComponent(target)}`)
+                .then(resp => resp.json())
+                .then(data => {
+                    edgeSkillsCache[cacheKey] = data.common_skills || [];
+                    const common = edgeSkillsCache[cacheKey].join(', ') || 'нет общих навыков';
+                    if (hoverTooltip.style.display === 'block' && hoverTooltip.dataset.edgeKey == cacheKey) {
+                        hoverTooltip.innerHTML = `<strong>${source}</strong> ↔ <strong>${target}</strong><br>Общие навыки: ${common}`;
+                    }
+                })
+                .catch(() => {});
+        }
+
+        // Подсветка ребра
         d3.select(this)
             .attr('stroke', '#FFC107')
             .attr('stroke-opacity', 1)
-            .attr('stroke-width', Math.sqrt(d.weight) * 7)   // ещё жирнее при наведении
+            .attr('stroke-width', Math.sqrt(d.weight) * 7)
             .style('filter', 'drop-shadow(0 0 8px #FFC107)');
         node.filter(n => n.id === d.source.id || n.id === d.target.id)
             .attr('stroke', '#FFA500')
             .attr('stroke-width', 2);
-    }).on('mouseout', function(event, d) {
+    })
+    .on('mousemove', function(event, d) {
+        if (hoverTooltip.style.display === 'block') {
+            const rect = container.getBoundingClientRect();
+            const offsetX = event.clientX - rect.left;
+            const offsetY = event.clientY - rect.top;
+            hoverTooltip.style.left = (offsetX + 15) + 'px';
+            hoverTooltip.style.top = (offsetY + 15) + 'px';
+        }
+    })
+    .on('mouseout', function(event, d) {
+        hideHoverTooltip();
         const isConnectedToSelected = (d.source.id === selectedNodeId || d.target.id === selectedNodeId);
         if (selectedNodeId !== null && isConnectedToSelected) {
             d3.select(this)
@@ -265,6 +334,34 @@ function renderD3Graph(data) {
         node.filter(n => n.id === d.source.id || n.id === d.target.id)
             .attr('stroke', (n) => n.id === selectedNodeId ? '#FFA500' : '#2c3e50')
             .attr('stroke-width', (n) => n.id === selectedNodeId ? 3 : 1);
+    });
+
+    // ---- Статический тултип для клика ----
+    function showStaticTooltip(d) {
+        fetch(`/api/graph/profession/${encodeURIComponent(d.label)}/skills?limit=10`)
+            .then(resp => resp.json())
+            .then(data => {
+                const tooltip = document.getElementById('graph-tooltip');
+                tooltip.innerHTML = `<strong>${d.label}</strong> (${d.count} вакансий, ${d.degree} связей)<br>Топ навыки: ${data.map(s => s.skill + ' (' + s.count + ')').join(', ')}`;
+            });
+    }
+
+    // ---- Клик по узлу ----
+    node.on('click', function(event, d) {
+        event.stopPropagation();
+        if (selectedNodeId === d.id) {
+            clearHighlight();
+            selectedNodeId = null;
+            zoomApplied = false;
+            applyAutoZoom(nodes, width, height);
+            document.getElementById('graph-tooltip').innerHTML = '';
+            return;
+        }
+        clearHighlight();
+        highlightNode(d);
+        selectedNodeId = d.id;
+        showStaticTooltip(d);
+        zoomToNode(d, width, height);
     });
 
     // ---- Клик по ребру ----
@@ -327,7 +424,7 @@ function renderD3Graph(data) {
         window._graphTransform = transform;
     }
 
-    // ---- Автоцентрирование (один раз) ----
+    // ---- Автоцентрирование ----
     function applyAutoZoom(nodes, w, h) {
         if (zoomApplied) return;
         let centerNode = null;
@@ -429,16 +526,6 @@ function renderD3Graph(data) {
             container.requestFullscreen().catch(err => {});
         }
     };
-
-    // ---- Тултип ----
-    function showTooltip(d) {
-        fetch(`/api/graph/profession/${encodeURIComponent(d.label)}/skills?limit=10`)
-            .then(resp => resp.json())
-            .then(data => {
-                const tooltip = document.getElementById('graph-tooltip');
-                tooltip.innerHTML = `<strong>${d.label}</strong> (${d.count} вакансий, ${d.degree} связей)<br>Топ навыки: ${data.map(s => s.skill + ' (' + s.count + ')').join(', ')}`;
-            });
-    }
 
     // ---- Автоцентрирование по завершении симуляции ----
     simulation.on('end', () => {
