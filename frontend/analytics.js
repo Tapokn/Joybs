@@ -16,10 +16,20 @@ async function loadAnalytics() {
 
 function renderOverview(data) {
     const stats = data.stats;
+    const context = data.context_info || {};
+    let contextText = '';
+    if (context.type === 'all') {
+        contextText = 'Весь рынок';
+    } else if (context.type === 'group') {
+        contextText = `Группа: ${context.value}`;
+    } else if (context.type === 'profession') {
+        contextText = `Профессия: ${context.value}`;
+    }
     document.getElementById('statsPlaceholder').innerHTML = `
         <p><strong>Всего вакансий:</strong> ${stats.total_vacancies} &nbsp;|&nbsp;
         <strong>Групп профессий:</strong> ${stats.total_groups} &nbsp;|&nbsp;
         <strong>Общая медиана зарплаты:</strong> ${data.overall_median ? Math.round(data.overall_median).toLocaleString() + ' ₽' : 'Нет данных'}
+        <br><strong>Контекст:</strong> ${contextText}
         </p>
     `;
 }

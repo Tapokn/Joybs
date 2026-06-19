@@ -269,6 +269,11 @@ contextTabs.forEach(tab => {
             contextTabs.forEach(t => t.classList.remove('context-tab--active'));
             this.classList.add('context-tab--active');
             closeContextDropdown();
+            // Очищаем селектор графа, если он ещё существует (для безопасности)
+            const graphGroupFilter = document.getElementById('graphGroupFilter');
+            if (graphGroupFilter) {
+                graphGroupFilter.value = '';
+            }
             applyContext();
             return;
         }

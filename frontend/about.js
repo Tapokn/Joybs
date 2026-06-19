@@ -1,16 +1,27 @@
 // ========== ГРАФ ПРОФЕССИЙ ==========
 async function loadProfessionGraph() {
-    // Определяем группу: если контекст = группа, берем из contextValue, иначе из селектора
+    // Определяем группу или профессию из глобального контекста
     let group = '';
+    let profession = '';
+    
     if (contextType === 'group' && contextValue) {
         group = contextValue;
-    } else {
-        group = document.getElementById('graphGroupFilter').value || '';
+    } else if (contextType === 'profession' && contextValue) {
+        profession = contextValue;
     }
+    // Если contextType === 'all', оба остаются пустыми
 
     const threshold = document.getElementById('jaccardThreshold').value || 0.1;
-    const minVac = document.getElementById('minVacancies').value || 5;
-    const url = `/api/graph/professions?threshold=${threshold}&min_vacancies=${minVac}&group=${encodeURIComponent(group)}`;
+    // Минимальное количество вакансий всегда = 1 (убираем из интерфейса)
+    const minVacancies = 1;
+
+    let url = `/api/graph/professions?threshold=${threshold}&min_vacancies=${minVacancies}`;
+    if (group) {
+        url += `&group=${encodeURIComponent(group)}`;
+    } else if (profession) {
+        url += `&profession=${encodeURIComponent(profession)}`;
+    }
+
     try {
         const resp = await fetch(url);
         const data = await resp.json();

@@ -17,11 +17,14 @@ def jaccard(set1, set2):
     union = len(set1 | set2)
     return inter / union if union else 0
 
+from collections import deque
+
 @router.get("/graph/professions")
 async def get_professions_graph(
     threshold: float = Query(0.1, ge=0, le=1),
     min_vacancies: int = Query(5),
-    group: Optional[str] = Query(None)
+    group: Optional[str] = Query(None),
+    profession: Optional[str] = Query(None)  # новый параметр
 ):
     conn = await get_db()
     cursor = await conn.execute("SELECT profession, key_skills FROM vacancies")
@@ -55,9 +58,41 @@ async def get_professions_graph(
                 skills_set.update(skills)
         prof_skills[prof] = skills_set
     
-    # Строим узлы
+    # Строим полный граф (все рёбра)
+    all_edges = []
+    prof_list = list(popular_profs)
+    for i in range(len(prof_list)):
+        for j in range(i+1, len(prof_list)):
+            p1, p2 = prof_list[i], prof_list[j]
+            jac = jaccard(prof_skills[p1], prof_skills[p2])
+            if jac >= threshold:
+                all_edges.append((p1, p2, jac))
+    
+    # Если указана профессия, строим подграф с глубиной 3
+    filtered_profs = set(popular_profs)
+    if profession and profession in filtered_profs:
+        # BFS для поиска профессий на расстоянии ≤ 3
+        adj = {p: [] for p in popular_profs}
+        for p1, p2, w in all_edges:
+            adj[p1].append(p2)
+            adj[p2].append(p1)
+        
+        # BFS
+        queue = deque([(profession, 0)])
+        visited = {profession}
+        while queue:
+            node, dist = queue.popleft()
+            if dist >= 3:
+                continue
+            for neighbor in adj[node]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append((neighbor, dist + 1))
+        filtered_profs = visited
+    
+    # Фильтруем узлы
     nodes = []
-    for prof in popular_profs:
+    for prof in filtered_profs:
         group_name = get_profession_group(prof) or "Другое"
         nodes.append({
             "id": f"prof_{prof}",
@@ -66,21 +101,17 @@ async def get_professions_graph(
             "vacancy_count": prof_count[prof]
         })
     
-    # Строим ребра по Жаккару
+    # Фильтруем рёбра
     edges = []
-    prof_list = list(popular_profs)
-    for i in range(len(prof_list)):
-        for j in range(i+1, len(prof_list)):
-            p1, p2 = prof_list[i], prof_list[j]
-            jac = jaccard(prof_skills[p1], prof_skills[p2])
-            if jac >= threshold:
-                common_skills = list(prof_skills[p1] & prof_skills[p2])
-                edges.append({
-                    "source": f"prof_{p1}",
-                    "target": f"prof_{p2}",
-                    "weight": jac,
-                    "common_skills": common_skills[:10]
-                })
+    for p1, p2, w in all_edges:
+        if p1 in filtered_profs and p2 in filtered_profs:
+            common_skills = list(prof_skills[p1] & prof_skills[p2])
+            edges.append({
+                "source": f"prof_{p1}",
+                "target": f"prof_{p2}",
+                "weight": w,
+                "common_skills": common_skills[:10]
+            })
     
     return {"nodes": nodes, "edges": edges}
 

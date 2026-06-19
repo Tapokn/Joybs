@@ -108,13 +108,13 @@ def calculate_pie_data(rows, context_type, context_value):
     return [{"label": k, "count": v} for k, v in main.items()]
 
 def calculate_median_by_groups(rows, context_type, context_value):
-    """Группировка для медиан: all -> profession_group; group -> search_query; profession -> title."""
+    """Группировка для медиан: all -> profession_group; group -> search_query; profession -> experience."""
     if context_type == "all":
         group_key = "profession_group"  # вычисляем динамически
     elif context_type == "group":
         group_key = "search_query"
-    else:
-        group_key = "title"
+    else:  # profession -> группируем по опыту
+        group_key = "experience"
     
     groups = defaultdict(list)
     for r in rows:
@@ -216,6 +216,10 @@ async def get_overview(
         "stats": {
             "total_vacancies": total_vacancies,
             "total_groups": total_groups
+        },
+        "context_info": {
+            "type": context_type,
+            "value": context_value
         },
         "overall_median": overall_median,
         "pie_data": pie_data,

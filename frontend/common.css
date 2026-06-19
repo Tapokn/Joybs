@@ -22,7 +22,7 @@ body {
     z-index: 1000;
     background: #FFFFFF;
     border-bottom: 1px solid #E8E3DE;
-    padding: 0.8rem 0;
+    padding: 0.5rem 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: transform 0.3s ease;
 }
@@ -43,11 +43,9 @@ body {
 .header__logo {
     font-weight: 700;
     font-size: 1.6rem;
-    color: #4682B4;
+    color: #e7b913e0;
     text-decoration: none;
-    letter-spacing: -0.5px;
-    flex-shrink: 0;
-    margin-right: 2rem;
+    letter-spacing: -2px;    
 }
 
 /* Навигация по центру */
@@ -59,11 +57,11 @@ body {
 }
 
 .header__tab {
-    padding: 0.5rem 1.2rem;
+    padding: 0.4rem 1rem;
     border: none;
     border-radius: 30px;
     background: transparent;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #7F8C8D;
     cursor: pointer;
     transition: 0.2s;
@@ -85,9 +83,7 @@ body {
     gap: 0;
     max-width: 1400px;
     margin: 1.5rem auto;
-    padding: 0 1.5rem;
     flex: 1;
-    width: 100%;
 }
 
 /* Левая панель – контекстные табы */
@@ -232,9 +228,11 @@ body {
 }
 .section__title {
     font-size: 2rem;
-    font-weight: 300;
-    margin-bottom: 1.5rem;
+    font-weight: 350;
+    margin-bottom: 0.5rem;
     color: #2C3E50;
+    margin-left: 0.5rem
+
 }
 
 /* ===== КАРТОЧКИ (общие) ===== */
