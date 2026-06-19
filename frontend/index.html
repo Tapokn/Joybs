@@ -83,42 +83,74 @@
         <main class="page__main">
 
             <!-- ===== СЕКЦИЯ О ПРОЕКТЕ ===== -->
-            <section class="section section--active" id="section-about">
-                <h2 class="section__title">О проекте</h2>
-                <div class="card" id="about-text">
-                    <p><strong>Joybs</strong> – платформа для студентов и начинающих IT-специалистов. Мы помогаем анализировать рынок, находить востребованные навыки и строить карьерный путь на основе данных.</p>
-                    <p><strong>Стек:</strong> Python + FastAPI, SQLite, Chart.js, D3.js.</p>
-                    <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам, частота навыков, влияние навыков на зарплату, коэффициент Жаккара для сходства профессий.</p>
-                    <p><em>«Найди свой путь в IT через данные»</em></p>
-                </div>
+<section class="section section--active" id="section-about">
+    <div class="about-header">
+        <h2 class="section__title">О проекте</h2>
+        <p class="about-subtitle">Платформа для анализа IT-рынка и построения карьеры</p>
+    </div>
 
-                <div class="card card--graph" id="about-graph">
-                    <h3>Граф сходства профессий</h3>
-                    <div class="graph-wrapper">
-                        <div id="profession-graph" class="graph-container"></div>
-                        <button class="graph__fullscreen-btn" id="fullscreenGraphBtn">⛶ На весь экран</button>
-                    </div>
-                    <div class="graph-controls">
-                        <span id="graph-context-info" class="graph-context-info"></span>
-                        <label>
-                            Порог Жаккара:
-                            <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1">
-                            <span id="jaccardValue">0.10</span>
-                        </label>
-                        <button id="updateGraphBtn">Обновить граф</button>
-                        <div class="graph-zoom-controls">
-                            <button id="zoomInBtn" title="Увеличить">+</button>
-                            <button id="zoomOutBtn" title="Уменьшить">−</button>
-                            <button id="zoomResetBtn" title="Сбросить масштаб">⟲</button>
-                        </div>
-                    </div>
-                    <div id="graph-tooltip" class="graph-tooltip"></div>
-                </div>
-            </section>
+    <!-- Граф сходства профессий -->
+    <div class="card card--graph" id="about-graph">
+        <h3>Граф сходства профессий</h3>
+        <div class="graph-wrapper">
+            <div id="profession-graph" class="graph-container"></div>
+            <button class="graph__fullscreen-btn" id="fullscreenGraphBtn">⛶ На весь экран</button>
+        </div>
+        <div class="graph-controls">
+            <span id="graph-context-info" class="graph-context-info"></span>
+            <label>
+                Порог Жаккара:
+                <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1">
+                <span id="jaccardValue">0.10</span>
+            </label>
+            <button id="updateGraphBtn">Обновить граф</button>
+            <div class="graph-zoom-controls">
+                <button id="zoomInBtn" title="Увеличить">+</button>
+                <button id="zoomOutBtn" title="Уменьшить">−</button>
+                <button id="zoomResetBtn" title="Сбросить масштаб">⟲</button>
+            </div>
+        </div>
+        <div id="graph-tooltip" class="graph-tooltip"></div>
+    </div>
+
+    <!-- Три вкладки: О проекте, Стек, Категории -->
+    <div class="about-tabs">
+        <div class="about-tabs__nav">
+            <button class="about-tab active" data-tab="about-text">О проекте</button>
+            <button class="about-tab" data-tab="stack">Стек и технологии</button>
+            <button class="about-tab" data-tab="categories">Категории профессий</button>
+        </div>
+        <div class="about-tabs__content">
+            <!-- Вкладка "О проекте" -->
+            <div class="about-tab-panel active" id="panel-about-text">
+                <p><strong>Joybs</strong> – платформа для студентов и начинающих IT-специалистов. Мы помогаем анализировать рынок, находить востребованные навыки и строить карьерный путь на основе данных.</p>
+                <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам, частота навыков, влияние навыков на зарплату, коэффициент Жаккара для сходства профессий.</p>
+                <p><em>«Найди свой путь в IT через данные»</em></p>
+            </div>
+            <!-- Вкладка "Стек и технологии" -->
+            <div class="about-tab-panel" id="panel-stack">
+                <ul>
+                    <li><strong>Бэкенд:</strong> Python + FastAPI, SQLite</li>
+                    <li><strong>Фронтенд:</strong> HTML/CSS/JS, Chart.js, D3.js</li>
+                    <li><strong>Аналитика:</strong> статистические расчёты, матрица навыков, граф сходства</li>
+                </ul>
+            </div>
+            <!-- Вкладка "Категории профессий" -->
+            <div class="about-tab-panel" id="panel-categories">
+                <div class="categories-grid" id="categoriesGrid"></div>
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
-            <section class="section" id="section-analytics">
-                <h2 class="section__title">Аналитика и навыки</h2>
+            
+<!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
+<section class="section" id="section-analytics">
+    <div class="about-header">
+        <h2 class="section__title">Аналитика и навыки</h2>
+        <p class="about-subtitle">Исследуйте рынок труда, востребованные навыки и зарплатные тренды</p>
+    </div>
 
                 <div class="card" id="stats-overview">
                     <h3>Общая статистика</h3>

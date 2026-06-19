@@ -131,3 +131,338 @@
     visibility: visible;
     transform: scale(1);
 }
+/* ===== ЗАГОЛОВОК СЕКЦИИ ===== */
+.about-header {
+    background: linear-gradient(135deg, #E3F0FA 0%, #FCE8E6 100%);
+    padding: 2rem 2rem 1.8rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    text-align: center;
+}
+.about-header .section__title {
+    font-size: 2.4rem;
+    font-weight: 300;
+    margin-bottom: 0.2rem;
+    color: #2C3E50;
+}
+.about-subtitle {
+    font-size: 1.2rem;
+    color: #5A6B7A;
+    margin: 0;
+}
+
+/* ===== КАРТОЧКИ "О ПРОЕКТЕ" ===== */
+.about-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.about-card {
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid #EDE9E4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.2s;
+}
+.about-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.about-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    background: #FCFAF8;
+    transition: background 0.2s;
+    user-select: none;
+}
+.about-card__header:hover {
+    background: #F5F2EE;
+}
+.about-card__header h3 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+    color: #2C3E50;
+}
+.about-card__icon {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #4682B4;
+    display: inline-block;
+}
+.about-card__body {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 1.5rem;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    background: #FFFFFF;
+}
+.about-card.active .about-card__body {
+    max-height: 500px;
+    padding: 1.2rem 1.5rem;
+}
+.about-card.active .about-card__icon {
+    /* меняем текст через JS, поэтому трансформация не нужна */
+}
+
+/* Разноцветные заголовки */
+.about-card:nth-child(1) .about-card__header { background: #E3F0FA; }
+.about-card:nth-child(2) .about-card__header { background: #FCE8E6; }
+.about-card:nth-child(3) .about-card__header { background: #E6F3E8; }
+.about-card:nth-child(4) .about-card__header { background: #FFF3D6; }
+
+/* ===== КАТЕГОРИИ ПРОФЕССИЙ ===== */
+.about-categories {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+.about-categories h3 {
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin-bottom: 0.3rem;
+    color: #2C3E50;
+}
+.categories-subtitle {
+    color: #7F8C8D;
+    margin-bottom: 1.5rem;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.category-card {
+    background: #FFFFFF;
+    border: 1px solid #EDE9E4;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+}
+.category-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+}
+.category-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    color: #2C3E50;
+    font-size: 0.95rem;
+}
+.category-card__icon {
+    color: #f6aea8;
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+}
+.category-card.active .category-card__icon {
+    transform: rotate(180deg);
+}
+.category-card__body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, margin 0.3s ease;
+}
+.category-card.active .category-card__body {
+    max-height: 300px;
+    margin-top: 0.6rem;
+    overflow-y: auto;
+}
+.category-card__body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.5rem;
+}
+.category-card__body ul li {
+    background: rgba(255,255,255,0.7);
+    padding: 0.1rem 0.6rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    color: #2C3E50;
+    white-space: nowrap;
+    border: 1px solid #e0dad4;
+}
+/* ===== ВКЛАДКИ "О ПРОЕКТЕ" ===== */
+.about-tabs {
+    margin-top: 2rem;
+    background: #FFFFFF;
+    border-radius: 14px;
+    border: 1px solid #EDE9E4;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+    margin-bottom: 2.5rem;  /* добавляем отступ снизу */
+
+}
+.about-tabs__nav {
+    display: flex;
+    background: #FCFAF8;
+    border-bottom: 1px solid #EDE9E4;
+}
+.about-tab {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #7F8C8D;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-bottom 0.2s;
+    border-bottom: 3px solid transparent;
+}
+.about-tab:hover {
+    background: #F5F2EE;
+}
+.about-tab.active {
+    color: #4682B4;
+    border-bottom-color: #4682B4;
+    background: #FFFFFF;
+}
+.about-tabs__content {
+    padding: 1.5rem;
+}
+.about-tab-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+.about-tab-panel.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.about-tab-panel p {
+    margin-bottom: 0.8rem;
+    line-height: 1.7;
+}
+.about-tab-panel ul {
+    list-style: none;
+    padding: 0;
+}
+.about-tab-panel ul li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #F2EDE8;
+}
+.about-tab-panel ul li:last-child {
+    border-bottom: none;
+}
+
+/* ===== КАТЕГОРИИ ПРОФЕССИЙ (сетка) ===== */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.category-card {
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+}
+.category-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+.category-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+    color: #2C3E50;
+    font-size: 0.95rem;
+}
+.category-card__icon {
+    color: #5A6B7A;
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+}
+.category-card.active .category-card__icon {
+    transform: rotate(180deg);
+}
+.category-card__body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, margin 0.3s ease;
+}
+.category-card.active .category-card__body {
+    max-height: 300px;
+    margin-top: 0.6rem;
+    overflow-y: auto;
+}
+.category-card__body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.5rem;
+}
+.category-card__body ul li {
+    background: rgba(255,255,255,0.8);
+    padding: 0.1rem 0.6rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    color: #2C3E50;
+    white-space: nowrap;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+/* ===== ПАСТЕЛЬНЫЕ ФОНЫ ДЛЯ ВКЛАДОК ===== */
+.about-tab-panel#panel-about-text {
+    background: linear-gradient(135deg, #f0f7ff 0%, #fef0f0 100%);
+    border-radius: 12px;
+    padding: 1.5rem !important;
+    box-shadow: inset 0 1px 4px rgba(255,255,255,0.8);
+}
+.about-tab-panel#panel-stack {
+    background: linear-gradient(135deg, #f0faf0 0%, #f0f0fe 100%);
+    border-radius: 12px;
+    padding: 1.5rem !important;
+    box-shadow: inset 0 1px 4px rgba(255,255,255,0.8);
+}
+.about-tab-panel#panel-categories {
+    padding: 0 !important; /* убираем внутренний отступ, чтобы сетка сама управляла */
+    background: transparent;
+}
+.about-tab-panel ul {
+    list-style: none;
+    padding: 0;
+}
+.about-tab-panel ul li {
+    padding: 0.5rem 0.8rem;
+    margin: 0.3rem 0;
+    background: rgba(255,255,255,0.6);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.3);
+    backdrop-filter: blur(2px);
+}
+.about-tab-panel ul li:last-child {
+    border-bottom: none;
+}
+.about-tab-panel p {
+    background: rgba(255,255,255,0.5);
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    backdrop-filter: blur(2px);
+}

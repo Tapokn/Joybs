@@ -321,9 +321,9 @@ window.addEventListener('scroll', () => {
 function getAnchorsForTab(tab) {
     const anchors = {
         'about': [
-            { label: 'О проекте', target: '#about-text' },
-            { label: 'Граф', target: '#about-graph' }
-        ],
+                { label: 'Граф', target: '#about-graph' },
+                { label: 'О проекте', target: '.about-tabs' }
+            ],
         'analytics': [
             { label: 'Обзор', target: '#stats-overview' },
             { label: 'Распределение', target: '#distribution-pie' },

@@ -637,3 +637,199 @@ setTimeout(() => {
     updateGraphContextInfo();
     loadProfessionGraph();
 }, 100);
+// ========== ДАННЫЕ КАТЕГОРИЙ (из categories.py) ==========
+const categoriesData = {
+    "Языки программирования": [
+        "Python разработчик", "Java разработчик", "C++ разработчик",
+        "C# разработчик", "Go разработчик", "Rust разработчик",
+        "PHP разработчик", "1С разработчик", "JavaScript разработчик",
+        "TypeScript разработчик"
+    ],
+    "Мобильная разработка": [
+        "iOS разработчик", "Android разработчик", "Flutter разработчик"
+    ],
+    "Desktop разработка": [
+        "WPF разработчик", "Qt разработчик", "Delphi разработчик"
+    ],
+    "Веб-разработка (фронтенд фреймворки)": [
+        "React разработчик", "Angular разработчик", "Vue разработчик",
+        "HTML верстальщик"
+    ],
+    "Веб-разработка (бэкенд фреймворки)": [
+        "Node.js разработчик", "Django разработчик", "ASP.NET разработчик",
+        "Laravel разработчик"
+    ],
+    "Веб-разработка (общее)": [
+        "Frontend-разработчик", "Backend-разработчик"
+    ],
+    "Fullstack-разработка": [
+        "Fullstack разработчик"
+    ],
+    "Аналитика и данные": [
+        "Аналитик данных", "Бизнес-аналитик", "Системный аналитик",
+        "Продуктовый аналитик", "Маркетинговый аналитик", "BI-разработчик",
+        "Data Engineer", "Big Data инженер", "Data Architect"
+    ],
+    "Искусственный интеллект и ML": [
+        "Data Scientist", "ML Engineer", "NLP-инженер",
+        "Computer Vision инженер", "AI Researcher", "Prompt Engineer",
+        "AI-архитектор"
+    ],
+    "DevOps и инфраструктура": [
+        "DevOps-инженер", "Cloud Engineer", "Системный администратор",
+        "Сетевой инженер", "Database Administrator", "Kubernetes инженер",
+        "Linux администратор"
+    ],
+    "Кибербезопасность": [
+        "Инженер ИБ", "Аналитик ИБ", "AppSec инженер",
+        "Penetration Tester", "GRC специалист"
+    ],
+    "Тестирование": [
+        "QA инженер", "Automation QA", "SDET"
+    ],
+    "Управление проектами и продуктами": [
+        "Project Manager", "IT Project Manager", "Product Owner",
+        "Scrum Master", "Team Lead", "IT Director"
+    ],
+    "Консалтинг и корпоративные системы": [
+        "ERP-консультант", "1С консультант", "CRM-консультант",
+        "IT-консультант"
+    ],
+    "Техническая документация": [
+        "Технический писатель"
+    ],
+    "Поддержка": [
+        "Техническая поддержка", "Application Support", "L2/L3 поддержка"
+    ],
+    "Игры": [
+        "Game разработчик"
+    ]
+};
+
+// Пастельные цвета для категорий
+const pastelColors = [
+    '#FADADD', // нежно-розовый
+    '#FDEBD0', // персиковый
+    '#FCF3CF', // кремовый
+    '#D5F5E3', // мятный
+    '#D6EAF8', // голубой
+    '#E8DAEF', // сиреневый
+    '#F5B7B1', // коралловый
+    '#F9E79F', // жёлтый
+    '#A9DFBF', // зелёный
+    '#A9CCE3', // небесный
+    '#D7BDE2', // лавандовый
+    '#F5CBA7', // абрикосовый
+    '#AED6F1', // светло-синий
+    '#A3E4D7', // бирюзовый
+    '#FADBD8', // лососевый
+    '#F9E79F', // песочный
+    '#D5F5E3'  // светло-зелёный
+];
+
+// ========== РЕНДЕРИНГ КАТЕГОРИЙ (сетка) ==========
+function renderCategories() {
+    const container = document.getElementById('categoriesGrid');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const entries = Object.entries(categoriesData);
+    entries.forEach(([category, professions], index) => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        // Назначаем пастельный цвет по индексу (циклически)
+        const color = pastelColors[index % pastelColors.length];
+        card.style.background = `linear-gradient(135deg, ${color} 0%, #fcfaf8 100%)`;
+        card.style.border = `1px solid ${color}`;
+
+        const header = document.createElement('div');
+        header.className = 'category-card__header';
+        header.innerHTML = `
+            <span>${category}</span>
+            <span class="category-card__icon">▼</span>
+        `;
+
+        const body = document.createElement('div');
+        body.className = 'category-card__body';
+        const ul = document.createElement('ul');
+        professions.forEach(prof => {
+            const li = document.createElement('li');
+            li.textContent = prof;
+            ul.appendChild(li);
+        });
+        body.appendChild(ul);
+
+        card.appendChild(header);
+        card.appendChild(body);
+        container.appendChild(card);
+
+        // Клик по карточке – переключаем только её
+        card.addEventListener('click', function(e) {
+            // Если кликнули по элементу списка – ничего не делаем (чтобы не мешать скроллу)
+            if (e.target.tagName === 'LI') return;
+            // Переключаем класс active только у этой карточки
+            const isActive = this.classList.toggle('active');
+            const icon = this.querySelector('.category-card__icon');
+            icon.textContent = isActive ? '▲' : '▼';
+        });
+    });
+}
+
+// ========== ИНИЦИАЛИЗАЦИЯ ВКЛАДОК ==========
+function initAboutTabs() {
+    const tabs = document.querySelectorAll('.about-tab');
+    const panels = {
+        'about-text': document.getElementById('panel-about-text'),
+        'stack': document.getElementById('panel-stack'),
+        'categories': document.getElementById('panel-categories')
+    };
+
+    // Если категории ещё не отрендерены – сделаем это сразу (для первой загрузки)
+    if (!document.getElementById('categoriesGrid').children.length) {
+        renderCategories();
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            Object.values(panels).forEach(p => p.classList.remove('active'));
+
+            this.classList.add('active');
+            const tabId = this.dataset.tab;
+            if (panels[tabId]) {
+                panels[tabId].classList.add('active');
+                // Если переключились на категории – рендерим (если ещё нет)
+                if (tabId === 'categories') {
+                    const grid = document.getElementById('categoriesGrid');
+                    if (!grid.children.length) {
+                        renderCategories();
+                    }
+                }
+            }
+        });
+    });
+}
+
+// ========== ОБЩАЯ ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ "О ПРОЕКТЕ" ==========
+let aboutInitialized = false;
+
+function initAbout() {
+    if (!aboutInitialized) {
+        initAboutTabs();
+        aboutInitialized = true;
+    }
+}
+
+// Переопределяем loadProfessionGraph, чтобы при вызове инициализировать about
+const originalLoadProfessionGraph = window.loadProfessionGraph || function() {};
+window.loadProfessionGraph = function() {
+    initAbout();
+    originalLoadProfessionGraph.apply(this, arguments);
+};
+
+// Если страница уже загружена и about активна – инициализируем сразу
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('section-about').classList.contains('section--active')) {
+        initAbout();
+    }
+});

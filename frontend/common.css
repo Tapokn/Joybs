@@ -531,13 +531,13 @@ body {
 /* ========== МОБИЛЬНАЯ АДАПТАЦИЯ (≤ 992px) ========== */
 /* ============================================================ */
 @media (max-width: 992px) {
-    /* ---------- Блокируем горизонтальный скролл ---------- */
     html, body, .page, .page__main, .card, .filters, .vacancy-list,
-    .chart-container, .chart-container-sm, .graph-container,
-    #skills-matrix-container, #profession-graph {
-        overflow-x: hidden !important;
-        max-width: 100% !important;
-    }
+.chart-container, .chart-container-sm, .graph-container,
+#skills-matrix-container, #profession-graph,
+.about-tabs, .about-tabs__content, .graph-wrapper {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+}
     body {
         overflow-x: hidden !important;
         width: 100% !important;
