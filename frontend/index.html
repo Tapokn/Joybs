@@ -36,8 +36,7 @@
                 <button class="context-tab context-tab--active" data-context="all">Весь рынок</button>
                 <button class="context-tab" data-context="group">Группа</button>
                 <button class="context-tab" data-context="profession">Профессия</button>
-                        <div class="context-dropdown" id="contextDropdown"></div>
-
+                <div class="context-dropdown" id="contextDropdown"></div>
             </div>
             <div class="context-selector" id="contextSelector">
                 <input type="text" id="contextValue" placeholder="Название группы или профессии">
@@ -65,16 +64,22 @@
                         <button class="graph__fullscreen-btn" id="fullscreenGraphBtn">⛶ На весь экран</button>
                     </div>
                     <div class="graph-controls">
-                        <label>Порог Жаккара: <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1"></label>
-                        <span id="jaccardValue">0.10</span>
-
+                        <span id="graph-context-info" class="graph-context-info"></span>
+                        <label>
+                            Порог Жаккара:
+                            <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1">
+                            <span id="jaccardValue">0.10</span>
+                        </label>
                         <button id="updateGraphBtn">Обновить граф</button>
+                        <div class="graph-zoom-controls">
+                            <button id="zoomInBtn" title="Увеличить">+</button>
+                            <button id="zoomOutBtn" title="Уменьшить">−</button>
+                            <button id="zoomResetBtn" title="Сбросить масштаб">⟲</button>
+                        </div>
                     </div>
                     <div id="graph-tooltip" class="graph-tooltip"></div>
-                    <!-- под graph-tooltip -->
-                    <div id="graph-context-info" class="graph-context-info"></div>
                 </div>
-            </section>
+            </section> <!-- ← ЗАКРЫТИЕ СЕКЦИИ ABOUT -->
 
             <!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
             <section class="section" id="section-analytics">
@@ -147,10 +152,11 @@
                 <div class="card">
                     <div class="filters">
                         <input type="text" id="filterSearch" placeholder="Поиск по тексту (title/description)">
-<div class="profession-wrapper">
-    <input type="text" id="filterProfessionInput" placeholder="Все роли" autocomplete="off">
-    <div id="profession-dropdown" class="profession-dropdown"></div>
-</div>                        <div class="skills-wrapper">
+                        <div class="profession-wrapper">
+                            <input type="text" id="filterProfessionInput" placeholder="Все роли" autocomplete="off">
+                            <div id="profession-dropdown" class="profession-dropdown"></div>
+                        </div>
+                        <div class="skills-wrapper">
                             <input type="text" id="filterSkills" placeholder="Навыки (через запятую)" autocomplete="off">
                             <div id="skills-dropdown" class="skills-dropdown"></div>
                         </div>
@@ -159,10 +165,11 @@
                             <div id="company-dropdown" class="company-dropdown"></div>
                         </div>
                         <input type="text" id="filterCity" placeholder="Город">
-<div class="experience-wrapper">
-    <input type="text" id="filterExperienceInput" placeholder="Опыт" autocomplete="off">
-    <div id="experience-dropdown" class="experience-dropdown"></div>
-</div>                        <div id="salaryRange" style="display:none; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                        <div class="experience-wrapper">
+                            <input type="text" id="filterExperienceInput" placeholder="Опыт" autocomplete="off">
+                            <div id="experience-dropdown" class="experience-dropdown"></div>
+                        </div>
+                        <div id="salaryRange" style="display:none; gap:0.5rem; flex-wrap:wrap; align-items:center;">
                             <input type="number" id="filterSalaryFrom" placeholder="Зарплата от">
                             <input type="number" id="filterSalaryTo" placeholder="Зарплата до">
                         </div>

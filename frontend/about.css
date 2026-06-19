@@ -8,6 +8,11 @@
     border-radius: 12px;
     background: #FCFAF8;
     border: 1px solid #EDE9E4;
+    overflow: hidden;
+    cursor: grab;
+}
+#profession-graph:active {
+    cursor: grabbing;
 }
 .graph__fullscreen-btn {
     position: absolute;
@@ -20,6 +25,7 @@
     font-size: 0.9rem;
     cursor: pointer;
     backdrop-filter: blur(4px);
+    z-index: 10;
 }
 .graph-controls {
     display: flex;
@@ -27,11 +33,25 @@
     gap: 1rem;
     margin-top: 1rem;
     align-items: center;
-    justify-content: center;   /* центрируем по горизонтали */
-
+    justify-content: center;
 }
 .graph-controls label {
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+#jaccardValue {
+    font-weight: 600;
+    color: #4682B4;
+    min-width: 2.5rem;
+    text-align: center;
+}
+.graph-context-info {
+    font-size: 0.95rem;
+    color: #4682B4;
+    font-weight: 500;
+    margin-right: auto;
 }
 .graph-tooltip {
     margin-top: 0.8rem;
@@ -41,15 +61,6 @@
     min-height: 2rem;
     font-size: 0.95rem;
 }
-
-.graph-context-info {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    color: #4682B4;
-    font-weight: 500;
-}
-
-/* Стиль для кнопки "Обновить граф" */
 #updateGraphBtn {
     background: #4682B4;
     color: #FFFFFF;
@@ -69,3 +80,34 @@
 #updateGraphBtn:active {
     transform: scale(0.97);
 }
+.graph-zoom-controls {
+    display: flex;
+    gap: 0.3rem;
+}
+.graph-zoom-controls button {
+    background: #F2EDE8;
+    border: 1px solid #E8E3DE;
+    border-radius: 6px;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.graph-zoom-controls button:hover {
+    background: #E8DCD4;
+}
+/* курсор на рёбрах – обычная стрелка */
+.graph-group line {
+    cursor: default;
+}
+
+/* Курсор и свечение для связей */
+.graph-group line {
+    cursor: pointer;
+    transition: stroke 0.2s, stroke-width 0.2s, filter 0.2s;
+}
+/* Узлы – курсор pointer уже задан в JS */
