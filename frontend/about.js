@@ -161,7 +161,7 @@ function renderD3Graph(data) {
         .data(nodes)
         .enter().append('text')
         .text(d => d.label)
-        .attr('font-size', '10px', "'Science Gothic', sans-serif")
+        .attr('font-size', '10px')
         .attr('font-family', "'Science Gothic', sans-serif")  // добавляем
 
         .attr('dx', 12)
