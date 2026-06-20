@@ -442,3 +442,83 @@ headerTabs.forEach(tab => {
 
 // Инициализация
 updateMobileMenu('about');
+
+// ========== УПРАВЛЕНИЕ АГРЕГАТОРОМ ==========
+let aggregatorLoaded = false; // флаг, загружены ли данные
+let aggregatorExpanded = false;
+
+function toggleAggregator(expand, loadData = true) {
+    const wrapper = document.getElementById('aggregatorWrapper');
+    const btn = document.getElementById('aggregatorToggleBtn');
+    const icon = btn.querySelector('.aggregator-btn-icon');
+    const text = btn.querySelector('.aggregator-btn-text');
+
+    if (expand === undefined) {
+        // переключаем
+        expand = !aggregatorExpanded;
+    }
+
+    if (expand) {
+        wrapper.classList.add('expanded');
+        icon.textContent = '▼';
+        text.textContent = 'Скрыть агрегатор';
+        aggregatorExpanded = true;
+        if (loadData && !aggregatorLoaded) {
+            loadAllVacancies();
+            aggregatorLoaded = true;
+        }
+    } else {
+        wrapper.classList.remove('expanded');
+        icon.textContent = '▶';
+        text.textContent = 'Показать агрегатор';
+        aggregatorExpanded = false;
+    }
+}
+
+// Обработчик кнопки
+document.getElementById('aggregatorToggleBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleAggregator();
+});
+
+// При переключении вкладок управляем состоянием агрегатора
+// В existing code переключения вкладок уже есть, мы добавим логику после активации вкладки
+// Переопределим или дополним обработчик клика по вкладкам.
+
+// Сохраним оригинальный обработчик, если нужно, но проще добавить проверку после переключения.
+
+// В функции переключения вкладок (уже есть) добавим:
+// после установки active секции и вызова loadProfessionGraph / loadAnalytics / applyFiltersAndRender
+// добавим управление агрегатором.
+
+// Так как common.js загружается до about.js, мы можем добавить слушатель на клик по вкладкам.
+// Но проще использовать существующий обработчик, добавив в него блок.
+
+// Вместо модификации существующего кода, добавим отдельный слушатель на клик по вкладкам, который будет выполняться после основного.
+document.querySelectorAll('.header__tab').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tab = this.dataset.tab;
+        // Если агрегатор уже развёрнут, оставляем его как есть, если вкладка aggregator – разворачиваем,
+        // если другие – сворачиваем (но не удаляем данные).
+        setTimeout(() => {
+            if (tab === 'aggregator') {
+                // Разворачиваем и загружаем данные
+                toggleAggregator(true, true);
+            } else {
+                // Сворачиваем, но не трогаем данные
+                toggleAggregator(false, false);
+            }
+        }, 50);
+    });
+});
+
+// При загрузке страницы, если активна вкладка aggregator (по умолчанию about), но на всякий случай
+document.addEventListener('DOMContentLoaded', function() {
+    const activeTab = document.querySelector('.header__tab--active');
+    if (activeTab && activeTab.dataset.tab === 'aggregator') {
+        setTimeout(() => toggleAggregator(true, true), 100);
+    } else {
+        // По умолчанию агрегатор свёрнут
+        toggleAggregator(false, false);
+    }
+});

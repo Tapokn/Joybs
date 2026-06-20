@@ -8,8 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Science+Gothic:wght@100..900&display=swap" rel="stylesheet">
     <!-- Общие стили -->
     <link rel="stylesheet" href="common.css">
     <link rel="stylesheet" href="about.css">
@@ -85,74 +85,72 @@
         <main class="page__main">
 
             <!-- ===== СЕКЦИЯ О ПРОЕКТЕ ===== -->
-<section class="section section--active" id="section-about">
-    <div class="about-header">
-        <h2 class="section__title">О проекте</h2>
-        <p class="about-subtitle">Платформа для анализа IT-рынка и построения карьеры</p>
-    </div>
+            <section class="section section--active" id="section-about">
+                <div class="about-header">
+                    <h2 class="section__title">О проекте</h2>
+                    <p class="about-subtitle">Платформа для анализа IT-рынка и построения карьеры</p>
+                </div>
 
-    <!-- Граф сходства профессий -->
-    <div class="card card--graph" id="about-graph">
-        <h3>Граф сходства профессий</h3>
-        <div class="graph-wrapper">
-            <div id="profession-graph" class="graph-container"></div>
-            <button class="graph__fullscreen-btn" id="fullscreenGraphBtn">⛶ На весь экран</button>
-        </div>
-        <div class="graph-controls">
-            <span id="graph-context-info" class="graph-context-info"></span>
-            <label>
-                Порог Жаккара:
-                <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1">
-                <span id="jaccardValue">0.10</span>
-            </label>
-            <button id="updateGraphBtn">Обновить граф</button>
-            <div class="graph-zoom-controls">
-                <button id="zoomInBtn" title="Увеличить">+</button>
-                <button id="zoomOutBtn" title="Уменьшить">−</button>
-                <button id="zoomResetBtn" title="Сбросить масштаб">⟲</button>
-            </div>
-        </div>
-        <div id="graph-tooltip" class="graph-tooltip"></div>
-    </div>
+                <!-- Граф сходства профессий -->
+                <div class="card card--graph" id="about-graph">
+                    <h3>Граф сходства профессий</h3>
+                    <div class="graph-wrapper">
+                        <div id="profession-graph" class="graph-container"></div>
+                        <button class="graph__fullscreen-btn" id="fullscreenGraphBtn">⛶ На весь экран</button>
+                    </div>
+                    <div class="graph-controls">
+                        <span id="graph-context-info" class="graph-context-info"></span>
+                        <label>
+                            Порог Жаккара:
+                            <input type="range" id="jaccardThreshold" min="0" max="0.5" step="0.01" value="0.1">
+                            <span id="jaccardValue">0.10</span>
+                        </label>
+                        <button id="updateGraphBtn">Обновить граф</button>
+                        <div class="graph-zoom-controls">
+                            <button id="zoomInBtn" title="Увеличить">+</button>
+                            <button id="zoomOutBtn" title="Уменьшить">−</button>
+                            <button id="zoomResetBtn" title="Сбросить масштаб">⟲</button>
+                        </div>
+                    </div>
+                    <div id="graph-tooltip" class="graph-tooltip"></div>
+                </div>
 
-    <!-- Три вкладки: О проекте, Стек, Категории -->
-    <div class="about-tabs">
-        <div class="about-tabs__nav">
-            <button class="about-tab active" data-tab="about-text">О проекте</button>
-            <button class="about-tab" data-tab="stack">Стек и технологии</button>
-            <button class="about-tab" data-tab="categories">Категории профессий</button>
-        </div>
-        <div class="about-tabs__content">
-            <!-- Вкладка "О проекте" -->
-            <div class="about-tab-panel active" id="panel-about-text">
-                <p><strong>Joybs</strong> – платформа для студентов и начинающих IT-специалистов. Мы помогаем анализировать рынок, находить востребованные навыки и строить карьерный путь на основе данных.</p>
-                <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам, частота навыков, влияние навыков на зарплату, коэффициент Жаккара для сходства профессий.</p>
-                <p><em>«Найди свой путь в IT через данные»</em></p>
-            </div>
-            <!-- Вкладка "Стек и технологии" -->
-            <div class="about-tab-panel" id="panel-stack">
-                <ul>
-                    <li><strong>Бэкенд:</strong> Python + FastAPI, SQLite</li>
-                    <li><strong>Фронтенд:</strong> HTML/CSS/JS, Chart.js, D3.js</li>
-                    <li><strong>Аналитика:</strong> статистические расчёты, матрица навыков, граф сходства</li>
-                </ul>
-            </div>
-            <!-- Вкладка "Категории профессий" -->
-            <div class="about-tab-panel" id="panel-categories">
-                <div class="categories-grid" id="categoriesGrid"></div>
-            </div>
-        </div>
-    </div>
-</section>
+                <!-- Три вкладки: О проекте, Стек, Категории -->
+                <div class="about-tabs">
+                    <div class="about-tabs__nav">
+                        <button class="about-tab active" data-tab="about-text">О проекте</button>
+                        <button class="about-tab" data-tab="stack">Стек и технологии</button>
+                        <button class="about-tab" data-tab="categories">Категории профессий</button>
+                    </div>
+                    <div class="about-tabs__content">
+                        <!-- Вкладка "О проекте" -->
+                        <div class="about-tab-panel active" id="panel-about-text">
+                            <p><strong>Joybs</strong> – платформа для студентов и начинающих IT-специалистов. Мы помогаем анализировать рынок, находить востребованные навыки и строить карьерный путь на основе данных.</p>
+                            <p><strong>Метрики:</strong> медианная зарплата (RUR, 10k–600k), распределение по группам, частота навыков, влияние навыков на зарплату, коэффициент Жаккара для сходства профессий.</p>
+                            <p><em>«Найди свой путь в IT через данные»</em></p>
+                        </div>
+                        <!-- Вкладка "Стек и технологии" -->
+                        <div class="about-tab-panel" id="panel-stack">
+                            <ul>
+                                <li><strong>Бэкенд:</strong> Python + FastAPI, SQLite</li>
+                                <li><strong>Фронтенд:</strong> HTML/CSS/JS, Chart.js, D3.js</li>
+                                <li><strong>Аналитика:</strong> статистические расчёты, матрица навыков, граф сходства</li>
+                            </ul>
+                        </div>
+                        <!-- Вкладка "Категории профессий" -->
+                        <div class="about-tab-panel" id="panel-categories">
+                            <div class="categories-grid" id="categoriesGrid"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
-            
-<!-- ===== СЕКЦИЯ АНАЛИТИКА ===== -->
-<section class="section" id="section-analytics">
-    <div class="about-header">
-        <h2 class="section__title">Аналитика и навыки</h2>
-        <p class="about-subtitle">Исследуйте рынок труда, востребованные навыки и зарплатные тренды</p>
-    </div>
+            <section class="section" id="section-analytics">
+                <div class="about-header">
+                    <h2 class="section__title">Аналитика и навыки</h2>
+                    <p class="about-subtitle">Исследуйте рынок труда, востребованные навыки и зарплатные тренды</p>
+                </div>
 
                 <div class="card" id="stats-overview">
                     <h3>Общая статистика</h3>
@@ -218,46 +216,54 @@
                 </div>
             </section>
 
-            <!-- ===== СЕКЦИЯ АГРЕГАТОР ===== -->
-            <section class="section" id="section-aggregator">
-                <div class="card">
-                    <div class="filters">
-                        <input type="text" id="filterSearch" placeholder="Поиск по тексту (title/description)">
-                        <div class="profession-wrapper">
-                            <input type="text" id="filterProfessionInput" placeholder="Все роли" autocomplete="off">
-                            <div id="profession-dropdown" class="profession-dropdown"></div>
-                        </div>
-                        <div class="skills-wrapper">
-                            <input type="text" id="filterSkills" placeholder="Навыки (через запятую)" autocomplete="off">
-                            <div id="skills-dropdown" class="skills-dropdown"></div>
-                        </div>
-                        <div class="company-wrapper">
-                            <input type="text" id="filterCompanyInput" placeholder="Все компании" autocomplete="off">
-                            <div id="company-dropdown" class="company-dropdown"></div>
-                        </div>
-                        <input type="text" id="filterCity" placeholder="Город">
-                        <div class="experience-wrapper">
-                            <input type="text" id="filterExperienceInput" placeholder="Опыт" autocomplete="off">
-                            <div id="experience-dropdown" class="experience-dropdown"></div>
-                        </div>
-                        <div id="salaryRange" style="display:none; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-                            <input type="number" id="filterSalaryFrom" placeholder="Зарплата от">
-                            <input type="number" id="filterSalaryTo" placeholder="Зарплата до">
-                        </div>
-                        <label><input type="checkbox" id="filterHasSalary"> Только с зарплатой</label>
-                        <label><input type="checkbox" id="filterInternship"> Стажировка</label>
-                        <label><input type="checkbox" id="filterAccredited"> Аккредитованные IT</label>
-                        <div class="sort-wrapper">
-                            <input type="text" id="filterSortInput" placeholder="По релевантности" autocomplete="off">
-                            <div id="sort-dropdown" class="sort-dropdown"></div>
-                        </div>
-                        <button id="applyFilters">Применить</button>
-                        <button id="resetFilters">Сбросить</button>
-                    </div>
-                    <div id="vacancyList" class="vacancy-list"></div>
-                    <div id="loader" class="loader">Прокрутите для загрузки ещё</div>
+            <!-- ===== АГРЕГАТОР (общий блок, сворачиваемый) ===== -->
+            <div class="aggregator-wrapper" id="aggregatorWrapper">
+                <div class="aggregator-toggle">
+                    <button class="aggregator-btn" id="aggregatorToggleBtn">
+                        <span class="aggregator-btn-icon">▶</span>
+                        <span class="aggregator-btn-text">Показать агрегатор</span>
+                    </button>
                 </div>
-            </section>
+                <div class="aggregator-content" id="aggregatorContent">
+                    <div class="card">
+                        <div class="filters">
+                            <input type="text" id="filterSearch" placeholder="Поиск по тексту (title/description)">
+                            <div class="profession-wrapper">
+                                <input type="text" id="filterProfessionInput" placeholder="Все роли" autocomplete="off">
+                                <div id="profession-dropdown" class="profession-dropdown"></div>
+                            </div>
+                            <div class="skills-wrapper">
+                                <input type="text" id="filterSkills" placeholder="Навыки (через запятую)" autocomplete="off">
+                                <div id="skills-dropdown" class="skills-dropdown"></div>
+                            </div>
+                            <div class="company-wrapper">
+                                <input type="text" id="filterCompanyInput" placeholder="Все компании" autocomplete="off">
+                                <div id="company-dropdown" class="company-dropdown"></div>
+                            </div>
+                            <input type="text" id="filterCity" placeholder="Город">
+                            <div class="experience-wrapper">
+                                <input type="text" id="filterExperienceInput" placeholder="Опыт" autocomplete="off">
+                                <div id="experience-dropdown" class="experience-dropdown"></div>
+                            </div>
+                            <div id="salaryRange" style="display:none; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                                <input type="number" id="filterSalaryFrom" placeholder="Зарплата от">
+                                <input type="number" id="filterSalaryTo" placeholder="Зарплата до">
+                            </div>
+                            <label><input type="checkbox" id="filterHasSalary"> Только с зарплатой</label>
+                            <label><input type="checkbox" id="filterInternship"> Стажировка</label>
+                            <label><input type="checkbox" id="filterAccredited"> Аккредитованные IT</label>
+                            <div class="sort-wrapper">
+                                <input type="text" id="filterSortInput" placeholder="По релевантности" autocomplete="off">
+                                <div id="sort-dropdown" class="sort-dropdown"></div>
+                            </div>
+                            <button id="applyFilters">Применить</button>
+                            <button id="resetFilters">Сбросить</button>
+                        </div>
+                        <div id="vacancyList" class="vacancy-list"></div>
+                        <div id="loader" class="loader">Прокрутите для загрузки ещё</div>
+                    </div>
+                </div>
+            </div>
 
         </main>
 
@@ -271,10 +277,14 @@
     <!-- ========== ФУТЕР ========== -->
     <footer class="footer">
         <div class="footer__inner">
-            <div class="footer__sitemap">
+            <div class="footer__col">
+                <h4>Навигация</h4>
                 <a href="#section-about">О проекте</a>
                 <a href="#section-analytics">Аналитика</a>
                 <a href="#section-aggregator">Агрегатор</a>
+            </div>
+            <div class="footer__col">
+                <h4>Аналитика</h4>
                 <a href="#section-analytics" data-scroll="pie">Распределение</a>
                 <a href="#section-analytics" data-scroll="median">Зарплата</a>
                 <a href="#section-analytics" data-scroll="hist">Гистограмма</a>
@@ -282,7 +292,20 @@
                 <a href="#section-analytics" data-scroll="impact">Влияние навыков</a>
                 <a href="#section-analytics" data-scroll="matrix">Матрица</a>
             </div>
-            <div class="footer__copy">© 2026 Joybs. Данные с hh.ru.</div>
+            <div class="footer__col">
+                <h4>Контакты</h4>
+                <a href="https://github.com/joybs" target="_blank">🐙 GitHub</a>
+                <a href="https://t.me/joybs" target="_blank">✈️ Telegram</a>
+                <a href="mailto:info@joybs.ru">📧 Email</a>
+            </div>
+            <div class="footer__col">
+                <h4>Источники</h4>
+                <a href="https://hh.ru" target="_blank">🌐 hh.ru</a>
+                <a href="https://api.hh.ru" target="_blank">📊 API hh.ru</a>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="footer__copy">© 2026 Joybs. Все права защищены.</div>
         </div>
     </footer>
 
