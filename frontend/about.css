@@ -209,9 +209,7 @@
     max-height: 500px;
     padding: 1.2rem 1.5rem;
 }
-.about-card.active .about-card__icon {
-    /* меняем текст через JS, поэтому трансформация не нужна */
-}
+
 
 /* Разноцветные заголовки */
 .about-card:nth-child(1) .about-card__header { background: #E3F0FA; }

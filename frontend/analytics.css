@@ -1,4 +1,7 @@
 /* ===== ГРИДЫ ДЛЯ ГРАФИКОВ ===== */
+svg text {
+    font-family: 'Science Gothic', sans-serif !important;
+}
 .grid-2 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

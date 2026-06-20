@@ -1,4 +1,7 @@
-// ========== АНАЛИТИКА ==========
+// Устанавливаем шрифт по умолчанию для всех графиков Chart.js
+if (typeof Chart !== 'undefined') {
+    Chart.defaults.font.family = 'Science Gothic';
+}// ========== АНАЛИТИКА ==========
 async function loadAnalytics() {
     const url = `/api/analytics/overview?context_type=${contextType}&context_value=${encodeURIComponent(contextValue)}`;
     try {
@@ -276,7 +279,10 @@ function renderMatrix(data, topN) {
         .domain([0, maxWeight]);
 
     const matrixGroup = svg.append('g')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .attr('transform', `translate(${margin.left}, ${margin.top})`);
+        
 
     // Ячейки
     const cells = matrixGroup.selectAll('rect')
@@ -310,6 +316,8 @@ function renderMatrix(data, topN) {
         .style('font-size', fontSize + 'rem')
         .style('font-weight', '500')
         .style('fill', '#2C3E50')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .attr('transform', (d, i) => {
             const x = margin.left + i * cellSize + cellSize / 2;
             const y = margin.top - 10;
@@ -331,6 +339,7 @@ function renderMatrix(data, topN) {
         .style('font-size', '1rem')
         .style('font-weight', '500')
         .style('fill', '#2C3E50')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
         .text(d => d.length > 15 ? d.slice(0, 12) + '…' : d)
         .append('title')
         .text(d => d);
@@ -343,6 +352,8 @@ function renderMatrix(data, topN) {
 
     const defs = svg.append('defs');
     const linearGradient = defs.append('linearGradient')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .attr('id', 'legendGradient')
         .attr('x1', '0%').attr('y1', '0%')
         .attr('x2', '100%').attr('y2', '0%');
@@ -356,7 +367,10 @@ function renderMatrix(data, topN) {
         .attr('height', legendHeight)
         .style('fill', 'url(#legendGradient)')
         .style('stroke', '#ccc')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .style('stroke-width', 0.5);
+        
 
     svg.append('text')
         .attr('x', legendX)
@@ -364,6 +378,8 @@ function renderMatrix(data, topN) {
         .style('font-size', '0.9rem')
         .style('text-anchor', 'start')
         .style('fill', '#7F8C8D')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .text('0');
 
     svg.append('text')
@@ -372,6 +388,8 @@ function renderMatrix(data, topN) {
         .style('font-size', '0.9rem')
         .style('text-anchor', 'end')
         .style('fill', '#7F8C8D')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .text(maxWeight);
 
     svg.append('text')
@@ -380,6 +398,8 @@ function renderMatrix(data, topN) {
         .style('font-size', '0.9rem')
         .style('text-anchor', 'middle')
         .style('fill', '#7F8C8D')
+        .style('font-family', "'Science Gothic', sans-serif")  // добавляем
+
         .text('Совместная встречаемость');
 
     // === ТУЛТИП ===

@@ -3,9 +3,22 @@
     box-sizing: border-box;
     margin: 0;
 }
+/* ===== Подключаем шрифт ко всем элементам ===== */
+* {
+    font-family: 'Science Gothic', sans-serif !important;
+}
 
+/* Для элементов, которые могут сбрасывать шрифт (кнопки, поля ввода) */
+button, input, select, textarea {
+    font-family: 'Science Gothic', sans-serif !important;
+}
+
+/* Для SVG текста (граф, матрица) */
+text {
+    font-family: 'Science Gothic', sans-serif !important;
+}
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Science Gothic', sans-serif !important;;
     background: #F9F7F5;
     color: #2C3E50;
     line-height: 1.6;
@@ -608,7 +621,7 @@ body {
     .header__context .context-tab {
         writing-mode: horizontal-tb !important;
         padding: 1rem 0.8rem !important;
-        font-size: 0.9rem !important;
+        font-size: 0.7rem !important;
         border-radius: 20px !important;
         background: #F2EDE8 !important;
         color: #7F8C8D !important;
