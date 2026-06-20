@@ -169,3 +169,61 @@ svg text {
         height: 400px;
     }
 }
+/* ===== СТАТИСТИКА (карточки) ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+.stat-card {
+    background: #FCFAF8;
+    border: 1px solid #EDE9E4;
+    border-radius: 12px;
+    padding: 1.2rem 0.8rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.stat-value {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2C3E50;
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: #7F8C8D;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.stat-context .stat-value {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #4682B4;
+}
+/* Адаптив для маленьких экранов */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr 1fr; /* 2 колонки */
+        gap: 0.5rem;
+    }
+    .stat-card {
+        padding: 0.8rem 0.3rem;
+    }
+    .stat-value {
+        font-size: 1.4rem;
+    }
+    .stat-context .stat-value {
+        font-size: 0.95rem;
+    }
+    .stat-label {
+        font-size: 0.65rem;
+    }
+}

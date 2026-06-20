@@ -28,12 +28,27 @@ function renderOverview(data) {
     } else if (context.type === 'profession') {
         contextText = `Профессия: ${context.value}`;
     }
-    document.getElementById('statsPlaceholder').innerHTML = `
-        <p><strong>Всего вакансий:</strong> ${stats.total_vacancies} &nbsp;|&nbsp;
-        <strong>Групп профессий:</strong> ${stats.total_groups} &nbsp;|&nbsp;
-        <strong>Общая медиана зарплаты:</strong> ${data.overall_median ? Math.round(data.overall_median).toLocaleString() + ' ₽' : 'Нет данных'}
-        <br><strong>Контекст:</strong> ${contextText}
-        </p>
+
+    const container = document.getElementById('statsPlaceholder');
+    container.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">${stats.total_vacancies}</div>
+                <div class="stat-label">Всего вакансий</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${stats.total_groups}</div>
+                <div class="stat-label">Групп профессий</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${data.overall_median ? Math.round(data.overall_median).toLocaleString() + ' ₽' : 'Нет данных'}</div>
+                <div class="stat-label">Общая медиана зарплаты</div>
+            </div>
+            <div class="stat-card stat-context">
+                <div class="stat-value">${contextText}</div>
+                <div class="stat-label">Контекст</div>
+            </div>
+        </div>
     `;
 }
 
