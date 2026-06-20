@@ -47,7 +47,10 @@ document.querySelectorAll('.header__tab').forEach(btn => {
         const tab = this.dataset.tab;
         currentTab = tab;
         document.querySelectorAll('.section').forEach(s => s.classList.remove('section--active'));
-        document.getElementById('section-' + tab).classList.add('section--active');
+        const section = document.getElementById('section-' + tab);
+        if (section) section.classList.add('section--active');
+
+        // Управление панелями
         if (tab === 'about' || tab === 'analytics') {
             document.getElementById('leftPanel').style.display = '';
             document.getElementById('rightPanel').style.display = '';
@@ -56,6 +59,8 @@ document.querySelectorAll('.header__tab').forEach(btn => {
             document.getElementById('leftPanel').style.display = 'none';
             document.getElementById('rightPanel').style.display = 'none';
         }
+
+        // Загрузка контента
         if (tab === 'about') {
             loadProfessionGraph();
         } else if (tab === 'analytics') {
@@ -68,16 +73,14 @@ document.querySelectorAll('.header__tab').forEach(btn => {
             }
         }
         closeContextDropdown();
-        // Обновляем мобильное меню
         updateMobileMenu(tab);
     });
 });
 
+// По умолчанию активируем вкладку "О проекте"
 document.querySelector('.header__tab[data-tab="about"]').click();
-renderAnchors('about');
 
 // ========== КОНТЕКСТ (левая панель) ==========
-
 async function loadGroups() {
     if (groupsData.length) return groupsData;
     try {
@@ -103,24 +106,20 @@ async function loadProfessions() {
     }
 }
 
-// ========== ОБЩАЯ ФУНКЦИЯ ЗАКРЫТИЯ DROPDOWN ==========
 function closeContextDropdown() {
     const dropdowns = document.querySelectorAll('.context-dropdown');
     dropdowns.forEach(d => d.classList.remove('active'));
     document.getElementById('dropdownOverlay').classList.remove('active');
 }
 
-// Закрытие по клику на оверлей
 document.getElementById('dropdownOverlay').addEventListener('click', closeContextDropdown);
 
-// Закрытие при изменении размера окна (если стало десктопом)
 window.addEventListener('resize', function() {
     if (window.innerWidth > 992) {
         closeContextDropdown();
     }
 });
 
-// ========== ПОКАЗ DROPDOWN ДЛЯ ГРУПП ==========
 async function showGroupDropdown(targetDropdown) {
     const dropdown = targetDropdown || contextDropdown;
     const groups = await loadGroups();
@@ -146,7 +145,6 @@ async function showGroupDropdown(targetDropdown) {
     if (window.innerWidth <= 992) document.getElementById('dropdownOverlay').classList.add('active');
 }
 
-// ========== ПОКАЗ DROPDOWN ДЛЯ ПРОФЕССИИ ==========
 async function showProfessionDropdown(targetDropdown) {
     const dropdown = targetDropdown || contextDropdown;
     let professions = [];
@@ -219,7 +217,6 @@ async function showProfessionDropdown(targetDropdown) {
     setTimeout(() => input.focus(), 50);
 }
 
-// ========== ВЫБОР КОНТЕКСТА ==========
 function selectContextGroup(group) {
     contextValue = group;
     contextType = 'group';
@@ -249,13 +246,11 @@ function applyContext() {
     }
 }
 
-// ========== ОБРАБОТЧИКИ КОНТЕКСТНЫХ ТАБОВ ==========
 contextTabs.forEach(tab => {
     tab.addEventListener('click', function(e) {
         e.stopPropagation();
         const type = this.dataset.context;
 
-        // Если уже активен и открыт dropdown – закрываем
         if (this.classList.contains('context-tab--active') && 
             (contextDropdown.classList.contains('active') || contextDropdownMobile.classList.contains('active'))) {
             closeContextDropdown();
@@ -288,14 +283,12 @@ contextTabs.forEach(tab => {
     });
 });
 
-// Закрытие dropdown при клике вне контекстных табов
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.context-tabs') && !e.target.closest('.header__context')) {
         closeContextDropdown();
     }
 });
 
-// ========== СТАРЫЙ КОНТЕКСТНЫЙ СЕЛЕКТОР (скрыт) ==========
 document.getElementById('contextSelector').style.display = 'none';
 document.getElementById('applyContext').addEventListener('click', function() {
     contextValue = document.getElementById('contextValue').value.trim();
@@ -321,9 +314,9 @@ window.addEventListener('scroll', () => {
 function getAnchorsForTab(tab) {
     const anchors = {
         'about': [
-                { label: 'Граф', target: '#about-graph' },
-                { label: 'О проекте', target: '.about-tabs' }
-            ],
+            { label: 'Граф', target: '#about-graph' },
+            { label: 'О проекте', target: '.about-tabs' }
+        ],
         'analytics': [
             { label: 'Обзор', target: '#stats-overview' },
             { label: 'Распределение', target: '#distribution-pie' },
@@ -335,9 +328,7 @@ function getAnchorsForTab(tab) {
             { label: 'Влияние навыков', target: '#salary-impact' },
             { label: 'Матрица', target: '#skills-matrix' }
         ],
-        'aggregator': [
-            { label: 'Агрегатор', target: '#section-aggregator' }
-        ]
+        'aggregator': []  // на вкладке агрегатора якори не нужны
     };
     return anchors[tab] || [];
 }
@@ -429,7 +420,6 @@ mobileMenuSections.forEach(btn => {
     });
 });
 
-// Обновляем мобильное меню при переключении вкладок через MutationObserver
 const headerTabs = document.querySelectorAll('.header__tab');
 headerTabs.forEach(tab => {
     const observer = new MutationObserver(() => {
@@ -440,11 +430,10 @@ headerTabs.forEach(tab => {
     observer.observe(tab, { attributes: true, attributeFilter: ['class'] });
 });
 
-// Инициализация
 updateMobileMenu('about');
 
 // ========== УПРАВЛЕНИЕ АГРЕГАТОРОМ ==========
-let aggregatorLoaded = false; // флаг, загружены ли данные
+let aggregatorLoaded = false;
 let aggregatorExpanded = false;
 
 function toggleAggregator(expand, loadData = true) {
@@ -454,7 +443,6 @@ function toggleAggregator(expand, loadData = true) {
     const text = btn.querySelector('.aggregator-btn-text');
 
     if (expand === undefined) {
-        // переключаем
         expand = !aggregatorExpanded;
     }
 
@@ -475,50 +463,29 @@ function toggleAggregator(expand, loadData = true) {
     }
 }
 
-// Обработчик кнопки
 document.getElementById('aggregatorToggleBtn').addEventListener('click', function(e) {
     e.stopPropagation();
     toggleAggregator();
 });
 
-// При переключении вкладок управляем состоянием агрегатора
-// В existing code переключения вкладок уже есть, мы добавим логику после активации вкладки
-// Переопределим или дополним обработчик клика по вкладкам.
-
-// Сохраним оригинальный обработчик, если нужно, но проще добавить проверку после переключения.
-
-// В функции переключения вкладок (уже есть) добавим:
-// после установки active секции и вызова loadProfessionGraph / loadAnalytics / applyFiltersAndRender
-// добавим управление агрегатором.
-
-// Так как common.js загружается до about.js, мы можем добавить слушатель на клик по вкладкам.
-// Но проще использовать существующий обработчик, добавив в него блок.
-
-// Вместо модификации существующего кода, добавим отдельный слушатель на клик по вкладкам, который будет выполняться после основного.
 document.querySelectorAll('.header__tab').forEach(btn => {
     btn.addEventListener('click', function() {
         const tab = this.dataset.tab;
-        // Если агрегатор уже развёрнут, оставляем его как есть, если вкладка aggregator – разворачиваем,
-        // если другие – сворачиваем (но не удаляем данные).
         setTimeout(() => {
             if (tab === 'aggregator') {
-                // Разворачиваем и загружаем данные
                 toggleAggregator(true, true);
             } else {
-                // Сворачиваем, но не трогаем данные
                 toggleAggregator(false, false);
             }
         }, 50);
     });
 });
 
-// При загрузке страницы, если активна вкладка aggregator (по умолчанию about), но на всякий случай
 document.addEventListener('DOMContentLoaded', function() {
     const activeTab = document.querySelector('.header__tab--active');
     if (activeTab && activeTab.dataset.tab === 'aggregator') {
         setTimeout(() => toggleAggregator(true, true), 100);
     } else {
-        // По умолчанию агрегатор свёрнут
         toggleAggregator(false, false);
     }
 });
