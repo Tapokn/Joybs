@@ -150,19 +150,5 @@ uvicorn backend.main:app --reload
 
 ---
 
-## Лицензия
-
-Проект создан в образовательных целях. Данные предоставлены hh.ru через открытое API.
-
----
-
-## Контакты
-
-- **GitHub:** [Tapokn/Joybs](https://github.com/Tapokn/Joybs)
-- **Telegram:** [@joybs](https://t.me/joybs)
-- **Email:** info@joybs.ru
-
----
-
 **Удачи в поиске своего пути в IT! 🚀**
 ```
