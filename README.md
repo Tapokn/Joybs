@@ -132,9 +132,7 @@ cd Joybs
 
 ```bash
 python -m venv venv
-source venv/bin/activate   # для Linux/Mac
-# или
-venv\Scripts\activate      # для Windows
+venv\Scripts\activate      
 ```
 
 Установите зависимости:
