@@ -54,7 +54,74 @@
 ├── requirements.txt          # Зависимости Python
 └── README.md                 # Этот файл
 ```
+### Требования к таблице `vacancies`
 
+Для работы Joybs в файле `hh_parser.db` должна существовать таблица `vacancies`.  
+Все данные о вакансиях хранятся в ней. Ниже приведены поля и типы, которые использует бэкенд.
+
+> В SQLite типы являются «affinity»-типами.  
+> `BOOLEAN` обычно хранится как `0` / `1`, а `TIMESTAMP` — как текст или число.
+
+| Поле | Тип | Назначение |
+|---|---:|---|
+| `hh_id` | `INTEGER` | **PRIMARY KEY**. ID вакансии на hh.ru. |
+| `title` | `TEXT` | Название вакансии. |
+| `profession` | `TEXT` | Профессия / категория, по которой найдена вакансия. |
+| `search_query` | `TEXT` | Поисковый запрос, в рамках которого найдена вакансия. |
+| `city` | `TEXT` | Город / регион поиска. |
+| `company` | `TEXT` | Название компании. |
+| `employer_id` | `INTEGER` | ID работодателя на hh.ru. |
+| `company_logo` | `TEXT` | URL логотипа компании. |
+| `accredited_it` | `BOOLEAN` | Признак аккредитованной ИТ-компании. |
+| `salary_from` | `INTEGER` | Нижняя граница зарплаты. |
+| `salary_to` | `INTEGER` | Верхняя граница зарплаты. |
+| `salary_currency` | `TEXT` | Валюта зарплаты (`RUR`, `USD`, `EUR` и т.п.). |
+| `salary_gross` | `BOOLEAN` | Указана ли зарплата до вычета налогов. |
+| `salary_mode` | `TEXT` | Гранулярность зарплаты (`MONTH`, `HOUR`, `SHIFT` и т.п.). |
+| `salary_frequency` | `TEXT` | Частота выплат (`DAILY`, `WEEKLY`, `MONTHLY` и т.п.). |
+| `has_salary` | `BOOLEAN` | Вычисляемый признак: указана ли зарплата. |
+| `experience` | `TEXT` | Требуемый опыт (`noExperience`, `between1And3` и т.п.). |
+| `employment_form` | `TEXT` | Тип занятости (`FULL`, `PART`, `PROJECT` и т.п.). |
+| `work_schedule_by_days` | `TEXT` | График работы (`FIVE_ON_TWO_OFF`, `SEVEN_ON_ZERO_OFF`). |
+| `working_hours` | `INTEGER` | Количество рабочих часов в день, только число (например, `8`). |
+| `work_format` | `TEXT` | Формат работы (`ON_SITE`, `REMOTE`, `HYBRID`, `FIELD_WORK`). |
+| `accept_labor_contract` | `BOOLEAN` | Признак оформления по трудовому договору. |
+| `civil_law_contracts` | `TEXT` | Типы гражданско-правовых договоров. |
+| `internship` | `BOOLEAN` | Признак стажировки. |
+| `night_shifts` | `BOOLEAN` | Признак ночных смен. |
+| `fly_in_fly_out` | `TEXT` | Информация о вахте. |
+| `languages` | `TEXT` | Требуемые языки. |
+| `key_skills` | `TEXT` | Ключевые навыки. |
+| `description` | `TEXT` | Полное описание вакансии. |
+| `published_at` | `TEXT` | Дата публикации вакансии. |
+| `alternate_url` | `TEXT` | Ссылка на вакансию на сайте. |
+| `area_name` | `TEXT` | Название региона / области. |
+| `address_raw` | `TEXT` | Адрес в исходном виде. |
+| `address_metro` | `TEXT` | Ближайшая станция метро. |
+| `professional_roles` | `TEXT` | Профессиональные роли. |
+| `inclusiveness_types` | `TEXT` | Типы инклюзивности. |
+| `inclusiveness_description` | `TEXT` | Описание инклюзивности. |
+| `views_count` | `TEXT` | Количество просмотров (получается скрапингом). |
+| `created_at` | `TIMESTAMP` | Дата и время первой вставки записи. По умолчанию `CURRENT_TIMESTAMP`. |
+
+#### Индексы
+
+Для ускорения запросов должны быть созданы индексы:
+
+| Индекс | Поле |
+|---|---|
+| `idx_hh_id` | `hh_id` |
+| `idx_city` | `city` |
+| `idx_profession` | `profession` |
+
+#### Примечания
+
+- Вставка выполняется через `INSERT OR REPLACE` по `hh_id`, поэтому повторная вставка заменяет существующую запись.
+- `views_count` — единственное поле, которое берётся не из API, а скрапингом.
+- `has_salary` — вычисляемое поле.
+- `created_at` — служебное поле базы данных.
+- Временная таблица `dupes` создаётся только внутри операции дедупликации и в итоговой БД не хранится.
+- Если таблица отсутствует, бэкенд не сможет отдавать данные для аналитики и агрегатора.
 ---
 
 ## Установка и запуск
